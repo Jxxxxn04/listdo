@@ -4,7 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'package:listdo/constants.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -68,30 +68,27 @@ class _LoginPageState extends State<LoginPage> {
       child: Row(
         children: [
           const Spacer(),
-          Padding(
-            padding: EdgeInsets.only(),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: SizedBox(
-                height: 5.h,
-                width: 32.w,
-                child: Material(
-                  color: Colors.transparent,
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              height: 5.h,
+              width: 32.w,
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(15),
+                child: InkWell(
                   borderRadius: BorderRadius.circular(15),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(15),
-                    onTap: () {}, // TODO : Go to RegisterPage()
-                    child: Center(
-                      child: Text(
-                        text,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp
-                          ),
-                        )
-                      ),
+                  onTap: () {}, // TODO : Go to RegisterPage()
+                  child: Center(
+                    child: Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.sp
+                        ),
+                      )
                     ),
                   ),
                 ),
