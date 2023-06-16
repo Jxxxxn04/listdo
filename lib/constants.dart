@@ -8,6 +8,9 @@ class Constants {
   final Color _linearGradientColorBottomViolet = const Color(0xFFCA8EFF);
 
 
+  String get domainBaseUrl {
+    return _domainBaseUrl;
+  }
 
   Color get linearGradientTopColor {
     return _linearGradientColorTopBlue;

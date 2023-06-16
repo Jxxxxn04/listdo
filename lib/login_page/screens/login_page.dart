@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:listdo/api.dart';
 import 'package:sizer/sizer.dart';
 import 'package:listdo/constants.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,10 +16,13 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final Constants constants = Constants();
+  final Api api = Api();
 
   final _formKey = GlobalKey<FormState>();
   final _passwordTEC = TextEditingController();
   final _emailTEC = TextEditingController();
+
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -28,43 +35,59 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Container(
-        decoration:  BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              constants.linearGradientTopColor,
-              constants.linearGradientBottomColor
-            ]
-          )
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
-          child: Column(
-            children: [
-              _registerButtonWidget("Registrieren"),
-              _loginTextWidget("Einloggen"),
-              _formWidget(),
-              _forgotPasswordTextButtonWidget("Passwort vergessen?"),
-              SizedBox(height: 5.h,),
-              _loginButtonWidget("Anmelden"),
-              SizedBox(height: 8.w,),
-              _guestButtonWidget("Als Gast fortfahren"),
-              SizedBox(height: 5.h,),
-              _lineWithWord("oder"),
-              SizedBox(height: 5.h,),
-            ],
+      body: Stack(
+        children: [
+          Container(
+            decoration:  BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  constants.linearGradientTopColor,
+                  constants.linearGradientBottomColor
+                ]
+              )
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Column(
+                children: [
+                  _registerButtonWidget("Registrieren", 15.h, 100.w),
+                  _loginTextWidget("Einloggen", 8.h, 100.w),
+                  _formWidget(18.h, 100.w),
+                  _forgotPasswordTextButtonWidget("Passwort vergessen?", 5.h, 100.w),
+                  SizedBox(height: 5.h,),
+                  _loginButtonWidget("Anmelden", 7.h, 100.w),
+                  SizedBox(height: 8.w,),
+                  _guestButtonWidget("Als Gast fortfahren", 7.h, 100.w),
+                  SizedBox(height: 5.h,),
+                  _lineWithWord("oder", 0.2.h),
+                  SizedBox(height: 5.h,),
+                  _logInWithAppleButtonWidget("Mit Apple fortfahren", 7.h, 100.w),
+                  SizedBox(height: 3.h,),
+                  _logInWithGoogleButtonWidget("Mit Google fortfahren", 7.h, 100.w),
+                ],
+              ),
+            ),
           ),
-        ),
+          if(isLoading)
+            Container(
+              height: 100.h,
+              width: 100.w,
+              color: Colors.black.withOpacity(0.6),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
       ),
     );
   }
 
-  Widget _registerButtonWidget(String text) {
+  Widget _registerButtonWidget(String text, double height, double width) {
     return SizedBox(
-      height: 15.h,
-      width: 100.w,
+      height: height,
+      width: width,
       child: Row(
         children: [
           const Spacer(),
@@ -100,10 +123,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _forgotPasswordTextButtonWidget(String text) {
+  Widget _forgotPasswordTextButtonWidget(String text, double height, double width) {
     return SizedBox(
-      height: 5.h,
-      width: 100.w,
+      height: height,
+      width: width,
       child: Row(
         children: [
           Align(
@@ -139,10 +162,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _loginTextWidget(String text) {
+  Widget _loginTextWidget(String text, double height, double width) {
     return SizedBox(
-      height: 8.h,
-      width: 100.w,
+      height: height,
+      width: width,
       child: Text(
         text,
         style: GoogleFonts.poppins(
@@ -155,10 +178,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _formWidget() {
+  Widget _formWidget(double height, double width) {
     return SizedBox(
-      height: 18.h,
-      width: 100.w,
+      height: height,
+      width: width,
       child: Form(
         key: _formKey,
         child: Column(
@@ -174,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _emailFormInputFieldWidget(String hintText) {
     return TextFormField(
-      controller: _passwordTEC,
+      controller: _emailTEC,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.email_rounded),
         hintText: hintText,
@@ -210,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _passwordFormInputFieldWidget(String hintText) {
     return TextFormField(
-      controller: _emailTEC,
+      controller: _passwordTEC,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.lock),
           hintText: hintText,
@@ -244,10 +267,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _loginButtonWidget(String text) {
+  Widget _loginButtonWidget(String text, double height, double width) {
     return Container(
-      height: 7.h,
-      width: 100.w,
+      height: height,
+      width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -257,7 +280,7 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 6,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: () {},  // TODO : Login
+          onTap: _loginFunction,  // TODO : Login
           child: Center(
             child: Text(
               text,
@@ -275,10 +298,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _guestButtonWidget(String text) {
+  Widget _guestButtonWidget(String text, double height, double width) {
     return Container(
-      height: 7.h,
-      width: 100.w,
+      height: height,
+      width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -306,9 +329,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _lineWithWord (String word) {
+  Widget _lineWithWord (String word, double height) {
     return SizedBox(
-      height: 50,
+      height: height,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,6 +357,118 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+  }
+
+  Widget _logInWithGoogleButtonWidget(String text, double height, double width) {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10)
+      ),
+      child: Material(
+        borderRadius: BorderRadius.circular(10),
+        elevation: 4,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {},
+          child: Row(
+            children: [
+              Padding(padding:EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w) ,child: const Image(image: AssetImage("assets/images/google_logo.png"))),
+              const Spacer(),
+              Text(
+                text,
+                style: GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.bold
+                  )
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _logInWithAppleButtonWidget(String text, double height, double width) {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10)
+      ),
+      child: Material(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(10),
+        elevation: 4,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {},
+          child: Row(
+            children: [
+              Padding(padding:EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w) ,child: const Image(image: AssetImage("assets/images/apple_logo.png"))),
+              const Spacer(),
+              Text(
+                text,
+                style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold
+                    )
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  //Funktionen
+  void _loginFunction() async {
+
+    setState(() {
+      isLoading = true;
+    });
+
+    String email = _emailTEC.text.toString();
+    String password = _passwordTEC.text.toString();
+
+    http.Response response = await api.loginUser(email, password);
+    //print("${response.statusCode} \n ${response.body}");
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Status Code: ${response.statusCode.toString()} \n Message: ${response.body}")));
+
+    if (response.statusCode == 200) {
+       await _onSuccessLogin(response);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+
+  }
+
+  Future<void> _onSuccessLogin(http.Response response) async {
+    Map<String, dynamic> jsonMap = jsonDecode(response.body);
+
+    String message = jsonMap['message'];
+    int userID = jsonMap['userID'];
+    String username = jsonMap['username'];
+    String email = jsonMap['email'];
+    String createdAt = jsonMap['created_at'];
+
+    Future.delayed(const Duration(seconds: 2));
+
+    // TODO : Werte in SharedPrefernces speichern
+    // TODO : Auf HomePage weiterleiten
   }
 
 }
