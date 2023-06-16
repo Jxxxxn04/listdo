@@ -8,19 +8,20 @@ import 'package:listdo/constants.dart';
 import 'package:listdo/screens.dart';
 import 'package:sizer/sizer.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final Constants constants = Constants();
   final Api api = Api();
 
   final _formKey = GlobalKey<FormState>();
   final _passwordTEC = TextEditingController();
+  final _confirmTEC = TextEditingController();
   final _emailTEC = TextEditingController();
 
   bool isLoading = false;
@@ -39,39 +40,48 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
           Container(
-            decoration:  BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
                   constants.linearGradientTopColor,
                   constants.linearGradientBottomColor
-                ]
-              )
-            ),
+                ])),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.w),
               child: Column(
                 children: [
-                  _registerButtonWidget("Registrieren", 15.h, 100.w),
-                  _loginTextWidget("Einloggen", 8.h, 100.w),
-                  _formWidget(18.h, 100.w),
-                  _forgotPasswordTextButtonWidget("Passwort vergessen?", 5.h, 100.w),
-                  SizedBox(height: 5.h,),
-                  _loginButtonWidget("Anmelden", 7.h, 100.w),
-                  SizedBox(height: 8.w,),
+                  _registerButtonWidget("Einloggen", 15.h, 100.w),
+                  _loginTextWidget("Registrieren", 8.h, 100.w),
+                  _formWidget(26.h, 100.w),
+                  SizedBox(
+                    height: 3.h,
+                  ),
+                  _loginButtonWidget("Registrieren", 7.h, 100.w),
+                  SizedBox(
+                    height: 8.w,
+                  ),
                   _guestButtonWidget("Als Gast fortfahren", 7.h, 100.w),
-                  SizedBox(height: 5.h,),
+                  SizedBox(
+                    height: 5.h,
+                  ),
                   _lineWithWord("oder", 0.2.h),
-                  SizedBox(height: 5.h,),
-                  _logInWithAppleButtonWidget("Mit Apple fortfahren", 7.h, 100.w),
-                  SizedBox(height: 3.h,),
-                  _logInWithGoogleButtonWidget("Mit Google fortfahren", 7.h, 100.w),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  _logInWithAppleButtonWidget(
+                      "Mit Apple fortfahren", 7.h, 100.w),
+                  SizedBox(
+                    height: 3.h,
+                  ),
+                  _logInWithGoogleButtonWidget(
+                      "Mit Google fortfahren", 7.h, 100.w),
                 ],
               ),
             ),
           ),
-          if(isLoading)
+          if (isLoading)
             Container(
               height: 100.h,
               width: 100.w,
@@ -106,8 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const RegisterPage()));
-                  },
+                            builder: (context) => const LoginPage()));
+                  }, // TODO : Go to RegisterPage()
                   child: Center(
                     child: Text(text,
                         textAlign: TextAlign.center,
@@ -125,7 +135,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _forgotPasswordTextButtonWidget(String text, double height, double width) {
+  Widget _forgotPasswordTextButtonWidget(
+      String text, double height, double width) {
     return SizedBox(
       height: height,
       width: width,
@@ -143,16 +154,12 @@ class _LoginPageState extends State<LoginPage> {
                   borderRadius: BorderRadius.circular(15),
                   onTap: () {}, // TODO : Go to ForgotPasswordPage()
                   child: Center(
-                    child: Text(
-                        text,
+                    child: Text(text,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10.sp
-                          ),
-                        )
-                    ),
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 10.sp),
+                        )),
                   ),
                 ),
               ),
@@ -168,15 +175,10 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       height: height,
       width: width,
-      child: Text(
-        text,
-        style: GoogleFonts.poppins(
-          textStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 24.sp
-          ),
-        )
-      ),
+      child: Text(text,
+          style: GoogleFonts.poppins(
+            textStyle: TextStyle(color: Colors.white, fontSize: 24.sp),
+          )),
     );
   }
 
@@ -189,8 +191,14 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             _emailFormInputFieldWidget("Email"),
-            SizedBox(height: 4.w,),
+            SizedBox(
+              height: 4.w,
+            ),
             _passwordFormInputFieldWidget("Password"),
+            SizedBox(
+              height: 4.w,
+            ),
+            _confirmFormInputFieldWidget("Passwort bestätigen")
           ],
         ),
       ),
@@ -201,28 +209,21 @@ class _LoginPageState extends State<LoginPage> {
     return TextFormField(
       controller: _emailTEC,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.email_rounded),
-        hintText: hintText,
-        hintStyle: GoogleFonts.inter(
-          textStyle: TextStyle(
-              color: const Color(0xFFACACAC),
-              fontSize: 14.sp
+          prefixIcon: const Icon(Icons.email_rounded),
+          hintText: hintText,
+          hintStyle: GoogleFonts.inter(
+            textStyle:
+                TextStyle(color: const Color(0xFFACACAC), fontSize: 14.sp),
           ),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(
-            color: Colors.grey,
-            width: 2
-          )
-        )
-      ),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.grey, width: 2))),
       // The validator receives the text that the user has entered.
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -240,10 +241,8 @@ class _LoginPageState extends State<LoginPage> {
           prefixIcon: const Icon(Icons.lock),
           hintText: hintText,
           hintStyle: GoogleFonts.inter(
-            textStyle: TextStyle(
-                color: const Color(0xFFACACAC),
-                fontSize: 14.sp
-            ),
+            textStyle:
+                TextStyle(color: const Color(0xFFACACAC), fontSize: 14.sp),
           ),
           filled: true,
           fillColor: Colors.white,
@@ -253,12 +252,36 @@ class _LoginPageState extends State<LoginPage> {
           ),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 2
-              )
-          )
-      ),
+              borderSide: const BorderSide(color: Colors.grey, width: 2))),
+      // The validator receives the text that the user has entered.
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter some text';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _confirmFormInputFieldWidget(String hintText) {
+    return TextFormField(
+      controller: _confirmTEC,
+      decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.lock),
+          hintText: hintText,
+          hintStyle: GoogleFonts.inter(
+            textStyle:
+                TextStyle(color: const Color(0xFFACACAC), fontSize: 14.sp),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.grey, width: 2))),
       // The validator receives the text that the user has entered.
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -282,18 +305,14 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 6,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: _loginFunction,  // TODO : Login
+          onTap: _registerFunction, // TODO : Login
           child: Center(
-            child: Text(
-              text,
-              style: GoogleFonts.inter(
-                textStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.bold
-                )
-              )
-            ),
+            child: Text(text,
+                style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold))),
           ),
         ),
       ),
@@ -313,25 +332,21 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 6,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: () {},  // TODO : Login
+          onTap: () {}, // TODO : Login
           child: Center(
-            child: Text(
-                text,
+            child: Text(text,
                 style: GoogleFonts.inter(
                     textStyle: TextStyle(
                         color: Colors.white,
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.bold
-                    )
-                )
-            ),
+                        fontWeight: FontWeight.bold))),
           ),
         ),
       ),
     );
   }
 
-  Widget _lineWithWord (String word, double height) {
+  Widget _lineWithWord(String word, double height) {
     return SizedBox(
       height: height,
       child: Row(
@@ -347,7 +362,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           Text(
             word,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const Expanded(
             child: Divider(
@@ -361,13 +377,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _logInWithGoogleButtonWidget(String text, double height, double width) {
+  Widget _logInWithGoogleButtonWidget(
+      String text, double height, double width) {
     return Container(
       height: height,
       width: width,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10)
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: Material(
         borderRadius: BorderRadius.circular(10),
         elevation: 4,
@@ -376,17 +391,19 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () {},
           child: Row(
             children: [
-              Padding(padding:EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w) ,child: const Image(image: AssetImage("assets/images/google_logo.png"))),
+              Padding(
+                  padding:
+                      EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w),
+                  child: const Image(
+                      image: AssetImage("assets/images/google_logo.png"))),
               const Spacer(),
               Text(
                 text,
                 style: GoogleFonts.inter(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold
-                  )
-                ),
+                    textStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold)),
               ),
               const Spacer(),
             ],
@@ -400,9 +417,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       height: height,
       width: width,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10)
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: Material(
         color: Colors.black,
         borderRadius: BorderRadius.circular(10),
@@ -412,7 +427,11 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () {},
           child: Row(
             children: [
-              Padding(padding:EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w) ,child: const Image(image: AssetImage("assets/images/apple_logo.png"))),
+              Padding(
+                  padding:
+                      EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w),
+                  child: const Image(
+                      image: AssetImage("assets/images/apple_logo.png"))),
               const Spacer(),
               Text(
                 text,
@@ -420,9 +439,7 @@ class _LoginPageState extends State<LoginPage> {
                     textStyle: TextStyle(
                         color: Colors.white,
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.bold
-                    )
-                ),
+                        fontWeight: FontWeight.bold)),
               ),
               const Spacer(),
             ],
@@ -432,16 +449,27 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   //Funktionen
-  void _loginFunction() async {
+  void _registerFunction() async {
     setState(() {
       isLoading = true;
     });
 
     // TODO : Wenn Felder leer oder email ungültig Error anzeigen lassen
+
     String email = _emailTEC.text.toString();
     String password = _passwordTEC.text.toString();
+    String confirm = _confirmTEC.text.toString();
+
+    if (password != confirm) {
+      print("Falsches Passwort");
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    print("testitesto");
 
     http.Response response = await api.loginUser(email, password);
     //print("${response.statusCode} \n ${response.body}");
@@ -452,7 +480,7 @@ class _LoginPageState extends State<LoginPage> {
                 "Status Code: ${response.statusCode.toString()} \n Message: ${response.body}"))));
 
     if (response.statusCode == 200) {
-      await _onSuccessLogin(response);
+      await _onSuccessRegistration(response);
     }
 
     setState(() {
@@ -460,7 +488,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  Future<void> _onSuccessLogin(http.Response response) async {
+  Future<void> _onSuccessRegistration(http.Response response) async {
     Map<String, dynamic> jsonMap = jsonDecode(response.body);
 
     String message = jsonMap['message'];
@@ -471,10 +499,6 @@ class _LoginPageState extends State<LoginPage> {
 
     Future.delayed(const Duration(seconds: 2));
 
-    // TODO : Werte in SharedPrefernces speichern
-    // TODO : Auf HomePage weiterleiten
-
-
+    // TODO : Wenn auf HomePage weitergeleitet Benutzernamen eingeben; Dafür auch noch eine NodeJS Datei machen
   }
-
 }
