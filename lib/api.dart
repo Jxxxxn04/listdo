@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'constants.dart';
 import 'package:http/http.dart' as http;
 
@@ -53,11 +55,11 @@ class Api {
     }
   }
 
-  Future<http.Response> registerUser(String email, String password) async {
+  Future<http.Response> registerUser(String username, String email, String password) async {
     final url = Uri.parse('${_constants.domainBaseUrl}/user/register');
     final headers = {'Content-Type': 'application/json',
       'Authorization': _apiKey};
-    final data = {'email' : email, 'password': password};
+    final data = {'username' : username, 'email' : email, 'password': password};
 
 
     try {
@@ -78,6 +80,36 @@ class Api {
 
     }
   }
+
+  Future<http.Response> hasUsername(int? userID) async {
+    final url = Uri.parse('${_constants.domainBaseUrl}/user/hasUsername/$userID');
+    final headers = {'Content-Type': 'application/json',
+      'Authorization': _apiKey};
+
+
+    try {
+      final response = await http.post(
+          url, headers: headers).timeout(
+          const Duration(seconds: 5));
+      return response;
+    } catch (e) {
+      if (e is TimeoutException) {
+        // Ein Timeout ist aufgetreten
+        if (kDebugMode) {
+          print('Timeout aufgetreten!');
+        }
+      } else {
+        // Anderer Fehler ist aufgetreten
+        if (kDebugMode) {
+          print('Fehler: $e');
+        }
+      }
+
+      return _noConnection;
+
+    }
+  }
+
 
 
 

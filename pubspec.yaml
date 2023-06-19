@@ -44,6 +44,8 @@ dependencies:
   flutter_custom_clippers: ^2.1.0
   emoji_picker_flutter: ^1.5.4
   google_fonts: ^4.0.4
+  shared_preferences: ^2.1.2
+  info_popup: ^3.0.4
 
 dev_dependencies:
   flutter_test:

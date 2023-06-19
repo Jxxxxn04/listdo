@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:info_popup/info_popup.dart';
 import 'package:listdo/api.dart';
 import 'package:listdo/constants.dart';
 import 'package:listdo/screens.dart';
 import 'package:sizer/sizer.dart';
+import 'package:listdo/register_page/widgets/register_widgets.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -23,11 +25,14 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordTEC = TextEditingController();
   final _confirmTEC = TextEditingController();
   final _emailTEC = TextEditingController();
+  final _usernameTEC = TextEditingController();
 
   bool isLoading = false;
 
   @override
   void dispose() {
+    _confirmTEC.dispose();
+    _usernameTEC.dispose();
     _passwordTEC.dispose();
     _emailTEC.dispose();
     super.dispose();
@@ -52,23 +57,23 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: EdgeInsets.symmetric(horizontal: 8.w),
               child: Column(
                 children: [
-                  _registerButtonWidget("Einloggen", 15.h, 100.w),
+                  _registerButtonWidget("Einloggen", 12.h, 100.w),
                   _loginTextWidget("Registrieren", 8.h, 100.w),
-                  _formWidget(26.h, 100.w),
+                  _formWidget(35.h, 100.w),
                   SizedBox(
                     height: 3.h,
                   ),
                   _loginButtonWidget("Registrieren", 7.h, 100.w),
                   SizedBox(
-                    height: 8.w,
+                    height: 4.w,
                   ),
                   _guestButtonWidget("Als Gast fortfahren", 7.h, 100.w),
                   SizedBox(
-                    height: 5.h,
+                    height: 2.h,
                   ),
-                  _lineWithWord("oder", 0.2.h),
+                  _lineWithWord("oder", 3.h),
                   SizedBox(
-                    height: 5.h,
+                    height: 2.h,
                   ),
                   _logInWithAppleButtonWidget(
                       "Mit Apple fortfahren", 7.h, 100.w),
@@ -117,7 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => const LoginPage()));
-                  }, // TODO : Go to RegisterPage()
+                  },
                   child: Center(
                     child: Text(text,
                         textAlign: TextAlign.center,
@@ -130,42 +135,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _forgotPasswordTextButtonWidget(
-      String text, double height, double width) {
-    return SizedBox(
-      height: height,
-      width: width,
-      child: Row(
-        children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              height: 5.h,
-              width: 45.w,
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(15),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(15),
-                  onTap: () {}, // TODO : Go to ForgotPasswordPage()
-                  child: Center(
-                    child: Text(text,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 10.sp),
-                        )),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const Spacer(),
         ],
       ),
     );
@@ -190,6 +159,10 @@ class _RegisterPageState extends State<RegisterPage> {
         key: _formKey,
         child: Column(
           children: [
+            UsernameInputField(controller: _usernameTEC, hintText: "Nutzername"),
+            SizedBox(
+              height: 4.w,
+            ),
             _emailFormInputFieldWidget("Email"),
             SizedBox(
               height: 4.w,
@@ -198,10 +171,59 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(
               height: 4.w,
             ),
-            _confirmFormInputFieldWidget("Passwort bestätigen")
+            _confirmFormInputFieldWidget("Passwort bestätigen"),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _usernameFormInputFieldWidget(String hintText) {
+    return TextFormField(
+      controller: _usernameTEC,
+      decoration: InputDecoration(
+        suffixIcon: InfoPopupWidget(
+          arrowTheme: InfoPopupArrowTheme(
+            color: Colors.purple,
+
+          ),
+          enableHighlight: true,
+          customContent: Center(
+            child: Container(
+              height: 40.h,
+              width: 50.w,
+              color: Colors.orange,
+              child: Text("Bliblablub"),
+            ),
+          ),
+          child: Icon(
+            Icons.info_outline,
+            color: Colors.red,
+            size: 24.sp,
+          ),
+        ),
+          prefixIcon: const Icon(Icons.drive_file_rename_outline_rounded),
+          hintText: hintText,
+          hintStyle: GoogleFonts.inter(
+            textStyle:
+            TextStyle(color: const Color(0xFFACACAC), fontSize: 14.sp),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.grey, width: 2))),
+      // The validator receives the text that the user has entered.
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter some text';
+        }
+        return null;
+      },
     );
   }
 
@@ -455,11 +477,14 @@ class _RegisterPageState extends State<RegisterPage> {
       isLoading = true;
     });
 
+    //_formKey.currentState?.validate();
+
     // TODO : Wenn Felder leer oder email ungültig Error anzeigen lassen
 
     String email = _emailTEC.text.toString();
     String password = _passwordTEC.text.toString();
     String confirm = _confirmTEC.text.toString();
+    String username = _usernameTEC.text.toString();
 
     if (password != confirm) {
       print("Falsches Passwort");
@@ -469,9 +494,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    print("testitesto");
-
-    http.Response response = await api.loginUser(email, password);
+    http.Response response = await api.registerUser(username, email, password);
     //print("${response.statusCode} \n ${response.body}");
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -499,6 +522,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
     Future.delayed(const Duration(seconds: 2));
 
-    // TODO : Wenn auf HomePage weitergeleitet Benutzernamen eingeben; Dafür auch noch eine NodeJS Datei machen
+    // TODO : Wenn auf HomePage weitergeleitet Benutzernamen eingeben
   }
 }

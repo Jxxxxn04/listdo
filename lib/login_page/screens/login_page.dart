@@ -6,7 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:listdo/api.dart';
 import 'package:listdo/constants.dart';
 import 'package:listdo/screens.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../test/test_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -18,6 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final Constants constants = Constants();
   final Api api = Api();
+
 
   final _formKey = GlobalKey<FormState>();
   final _passwordTEC = TextEditingController();
@@ -53,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.symmetric(horizontal: 8.w),
               child: Column(
                 children: [
-                  _registerButtonWidget("Registrieren", 15.h, 100.w),
+                  _registerButtonWidget("Registrieren", 12.h, 100.w),
                   _loginTextWidget("Einloggen", 8.h, 100.w),
                   _formWidget(18.h, 100.w),
                   _forgotPasswordTextButtonWidget("Passwort vergessen?", 5.h, 100.w),
@@ -62,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: 8.w,),
                   _guestButtonWidget("Als Gast fortfahren", 7.h, 100.w),
                   SizedBox(height: 5.h,),
-                  _lineWithWord("oder", 0.2.h),
+                  _lineWithWord("oder", 3.h),
                   SizedBox(height: 5.h,),
                   _logInWithAppleButtonWidget("Mit Apple fortfahren", 7.h, 100.w),
                   SizedBox(height: 3.h,),
@@ -313,7 +317,12 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 6,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: () {},  // TODO : Login
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const HomePage()));
+          },
           child: Center(
             child: Text(
                 text,
@@ -373,7 +382,12 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 4,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const InfoPopupPage()));
+          },
           child: Row(
             children: [
               Padding(padding:EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w) ,child: const Image(image: AssetImage("assets/images/google_logo.png"))),
@@ -462,14 +476,24 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _onSuccessLogin(http.Response response) async {
     Map<String, dynamic> jsonMap = jsonDecode(response.body);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String message = jsonMap['message'];
     int userID = jsonMap['userID'];
     String username = jsonMap['username'];
     String email = jsonMap['email'];
     String createdAt = jsonMap['created_at'];
 
     Future.delayed(const Duration(seconds: 2));
+
+    await prefs.setInt("userID", userID);
+    await prefs.setString("username", username);
+    await prefs.setString("email", email);
+    await prefs.setString("created_at", createdAt);
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const HomePage()));
 
     // TODO : Werte in SharedPrefernces speichern
     // TODO : Auf HomePage weiterleiten
