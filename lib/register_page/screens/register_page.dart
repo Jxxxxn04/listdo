@@ -18,7 +18,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final Constants constants = Constants();
   final Api api = Api();
 
   final _formKey = GlobalKey<FormState>();
@@ -45,13 +44,13 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                  constants.linearGradientTopColor,
-                  constants.linearGradientBottomColor
+                  Constants.linearGradientTopColor,
+                  Constants.linearGradientBottomColor
                 ])),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.w),

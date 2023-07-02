@@ -19,7 +19,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final Constants constants = Constants();
   final Api api = Api();
 
 
@@ -43,13 +42,13 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
           Container(
-            decoration:  BoxDecoration(
+            decoration:  const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  constants.linearGradientTopColor,
-                  constants.linearGradientBottomColor
+                  Constants.linearGradientTopColor,
+                  Constants.linearGradientBottomColor
                 ]
               )
             ),
@@ -386,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const InfoPopupPage()));
+                    builder: (context) => CookiePage()));
           },
           child: Row(
             children: [

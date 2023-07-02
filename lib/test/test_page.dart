@@ -1,163 +1,123 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:info_popup/info_popup.dart';
+import 'package:sizer/sizer.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart';
 
-const Key infoPopupTextExampleKey = Key('info_popup_text_example');
-const String infoPopupTextExampleText = 'This is a popup';
+class StreamSocket {
+  final _socketResponse = StreamController<String>();
 
-const Key infoPopupCustomExampleKey = Key('info_popup_custom_example');
-const String infoPopupCustomExampleText = 'This is a custom widget';
+  void Function(String) get addResponse => _socketResponse.sink.add;
 
-const Key infoPopupLongTextExampleKey = Key('info_popup_long_text_example');
-const String infoPopupLongTextExampleText = '''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Enim lobortis scelerisque fermentum dui faucibus in ornare quam viverra. Consectetur adipiscing elit ut aliquam purus sit. Nisl vel pretium lectus quam. Et odio pellentesque diam volutpat commodo. Diam vulputate ut pharetra sit amet aliquam id diam maecenas. Malesuada fames ac turpis egestas. Et sollicitudin ac orci phasellus egestas tellus rutrum. Pretium lectus quam id leo in. Semper risus in hendrerit gravida. Nullam ac tortor vitae purus faucibus ornare suspendisse sed. Non tellus orci ac auctor. Quis risus sed vulputate odio ut enim blandit.
-\n
-Nullam eget felis eget nunc lobortis mattis aliquam faucibus purus. Aenean et tortor at risus viverra adipiscing at in. Augue eget arcu dictum varius duis at consectetur. Est pellentesque elit ullamcorper dignissim cras. At consectetur lorem donec massa sapien faucibus et. Sit amet venenatis urna cursus eget. Dignissim cras tincidunt lobortis feugiat vivamus. Eget arcu dictum varius duis at. Aenean pharetra magna ac placerat. Enim nec dui nunc mattis enim ut tellus elementum. Laoreet suspendisse interdum consectetur libero. Tellus mauris a diam maecenas sed enim. Tortor posuere ac ut consequat semper viverra nam libero. Tellus molestie nunc non blandit massa.
-''';
+  Stream<String> get getResponse => _socketResponse.stream;
 
-const Key infoPopupArrowGapExampleKey = Key('info_popup_arrow_gap_example');
-const String infoPopupArrowGapExampleText = infoPopupLongTextExampleText;
-
-
-
-class InfoPopupPage extends StatefulWidget {
-  const InfoPopupPage({super.key});
-
-  @override
-  State<InfoPopupPage> createState() => _InfoPopupPageState();
+  void dispose() {
+    _socketResponse.close();
+  }
 }
 
-class _InfoPopupPageState extends State<InfoPopupPage> {
+StreamSocket streamSocket = StreamSocket();
+
+IO.Socket connectAndListen() {
+  IO.Socket socket = IO.io('http://zentrale.ddns.net:3000',
+      OptionBuilder().setTransports(['websocket']).build());
+
+  socket.onConnect((_) {
+    print('connect');
+  });
+
+  socket.on('totalClicks', (data) => streamSocket.addResponse(data.toString()));
+
+  socket.onDisconnect((_) => print('disconnect'));
+
+  socket.connect(); // Verbindung zum Server herstellen
+
+  return socket;
+}
+
+class CookiePage extends StatefulWidget {
+  const CookiePage({Key? key}) : super(key: key);
+
+  @override
+  State<CookiePage> createState() => _CookiePageState();
+}
+
+class _CookiePageState extends State<CookiePage> {
+
+  IO.Socket socket = connectAndListen(); // Verbindung herstellen und auf Daten hören
+
+  @override
+  void dispose() {
+    super.dispose();
+    print("dispose");
+    socket.dispose();
+    streamSocket.dispose();
+  }
+
+  void addCookie() {
+    socket.emit('click');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Align(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const InfoPopupWidget(
-                arrowTheme: InfoPopupArrowTheme(
-                  arrowDirection: ArrowDirection.down,
-                  color: Colors.pink,
-                ),
-                contentTitle: infoPopupTextExampleText,
-                child: Text('Info Popup Info Text Example'),
+    return StreamBuilder(
+        stream: streamSocket.getResponse,
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData) {
+            return Container(
+              decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFFFB88C),
+                        Color(0xFFDE6262)
+                      ]
+                  )
               ),
-              const SizedBox(height: 30),
-              InfoPopupWidget(
-                arrowTheme: const InfoPopupArrowTheme(
-                  color: Colors.black87,
-                  arrowDirection: ArrowDirection.down,
-                ),
-                customContent: Container(
-                  width: context.screenWidth * .8,
-                  decoration: BoxDecoration(
-                    color: Colors.blueGrey,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  child: const Column(
-                    children: <Widget>[
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your name',
-                          hintStyle: TextStyle(color: Colors.white),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
+              height: 100.h,
+              width: 100.w,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        splashFactory: NoSplash.splashFactory,
+                        borderRadius: BorderRadius.circular(256),
+                        onTap: addCookie,
+                        child: Image(
+                          image: AssetImage(
+                              "assets/images/cookie.png"
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
-                      Center(
-                        child: Text(
-                          infoPopupCustomExampleText,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                    ),),
+                  Center(child: Padding(
+                    padding: EdgeInsets.only(bottom: 50.h),
+                    child: Text(
+                      snapshot.data!,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.normal,
+                        decoration: TextDecoration.none
                       ),
-                    ],
-                  ),
-                ),
-                child: const Text('Info Popup Custom Widget Example'),
+                    ),
+                  ))
+                ],
               ),
-              const SizedBox(height: 30),
-              const InfoPopupWidget(
-                arrowTheme: InfoPopupArrowTheme(
-                  color: Colors.pink,
-                ),
-                contentTitle: infoPopupLongTextExampleText,
-                child: Text('Info Popup Long Info Text Example'),
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTap: () {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    builder: (_) {
-                      return Container(
-                        color: Colors.white,
-                        height: MediaQuery.of(context).size.height * .5,
-                        padding: const EdgeInsets.all(20),
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                InfoPopupWidget(
-                                  contentTitle: infoPopupLongTextExampleText,
-                                  child: Icon(
-                                    Icons.info,
-                                    color: Colors.pink,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Text('Info Popup Inside Bottom Sheet Example'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                behavior: HitTestBehavior.translucent,
-                child: const Text('Bottom Sheet Inside Example'),
-              ),
-              const SizedBox(height: 30),
-              const InfoPopupWidget(
-                contentTitle: 'Info Popup Icon Examplee',
-                arrowTheme: InfoPopupArrowTheme(
-                  color: Colors.pink,
-                ),
-                child: Icon(
-                  Icons.info,
-                  color: Colors.pink,
-                ),
-              ),
-              const SizedBox(height: 30),
-              const InfoPopupWidget(
-                contentOffset: Offset(0, 30),
-                contentTitle: infoPopupArrowGapExampleText,
-                child: Text('Info Popup Arrow Gap Example'),
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTap: () {},
-                behavior: HitTestBehavior.translucent,
-                child: const Text('List Example'),
-              ),
-              const SizedBox(height: 30),
-              const InfoPopupWidget(
-                enableHighlight: true,
-                contentTitle: 'This is a HighLighted Info Popup',
-                child: Text('HighLighted Info Popup Example'),
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+          } else {
+            return Container(
+              child: Text('No data'),
+            );
+          }
+        },
     );
   }
+
+
+
 }

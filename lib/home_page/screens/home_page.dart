@@ -1,128 +1,164 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:listdo/home_page/widgets/rounded_navigation_bar.dart';
-import 'package:listdo/screens.dart';
-import 'package:listdo/constants.dart';
-import 'package:listdo/api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:listdo/home_page/models/CustomListModel.dart';
 import 'package:sizer/sizer.dart';
-import 'package:http/http.dart' as http;
 
-class HomePage extends StatefulWidget {
+import '../../api.dart';
+import '../../constants.dart';
+import '../widgets/home_page_widgets.dart';
+
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final Constants constants = Constants();
-  final Api api = Api();
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-
-              //App Bar
-              _appBar("Meine Listen", 15.h, 100.w),
-
-              //List Body
-              Stack(
-                children: [
-                  Container(
-                    height: 85.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                          constants.linearGradientTopColor,
-                          constants.linearGradientBottomColor
-                          ]
-                      ),
-                    ),
-                  ),
-                  const Positioned(bottom: 0,child: RoundedNavigationBar(backgroundColor: Color(0xFF252525))),
-                ],
-              ),  // 11.h
-            ],
-          ),
-
-
-          //Loading Widget
-          if (_isLoading)
-            Container(
-              height: 100.h,
-              width: 100.w,
-              color: Colors.black.withOpacity(0.6),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-        ],
+      body: Column(
+        children: [_appBar(), _body()],
       ),
     );
   }
 
-  Widget _appBar(String text, double height, double width) {
+  Widget _appBar() {
     return Container(
-      height: height,
-      width: width,
+      height: 15.h,
+      width: 100.w,
       color: const Color(0xFF252525),
       child: Padding(
         padding: EdgeInsets.only(left: 5.w, bottom: 5.w),
         child: Align(
           alignment: Alignment.bottomLeft,
           child: Text(
-            text,
+            "Meine Listen",
             style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 16.sp
-              )
-            ),
+                textStyle: TextStyle(color: Colors.white, fontSize: 16.sp)),
           ),
         ),
       ),
     );
   }
 
+  Widget _body() {
+    return Stack(
+      children: [
+        const _GradientBackground(),
+        const Positioned(
+            bottom: 0,
+            child: RoundedNavigationBar(backgroundColor: Color(0xFF252525))),
+        // 11.h
+        _HomePageListBody(
+          height: 74.h,
+        ),
 
-  Future<bool> _hasUsername() async {
+        // TODO : CreateList Button
+      ],
+    );
+  }
+}
 
-    setState(() {
-      _isLoading = true;
-    });
+class _GradientBackground extends StatelessWidget {
+  const _GradientBackground({super.key});
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 85.h,
+      width: 100.w,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Constants.linearGradientTopColor,
+              Constants.linearGradientBottomColor
+            ]),
+      ),
+    );
+  }
+}
 
-    http.Response response = await api.hasUsername(prefs.getInt("userID"));
+class _HomePageListBody extends StatefulWidget {
+  const _HomePageListBody({super.key, required this.height});
 
-    if(response.statusCode == 500) {
+  final double height;
 
-      setState(() {
-        _isLoading = false;
-      });
+  @override
+  State<_HomePageListBody> createState() => _HomePageListBodyState();
+}
 
-      return false;
-    }
+class _HomePageListBodyState extends State<_HomePageListBody> {
+  Api api = Api();
 
-    setState(() {
-      _isLoading = false;
-    });
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: api.getLists(28), // TODO : sharedprefernces benutzen
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text(
+            snapshot.error.toString(),
+            style: TextStyle(color: Colors.red),
+          );
+        } else if (snapshot.hasData) {
+          // Konvertiere den JSON-Response in ein Dart-Map-Objekt
+          Map<String, dynamic> response =
+              json.decode(snapshot.data!.body.toString());
 
-    return true;
+          // Extrahiere das 'lists'-Array aus dem Response
+          List<dynamic> lists = response['lists'];
+
+          return gridView(lists);
+        } else {
+          return Container(
+              color: Colors.black.withOpacity(0.7),
+              height: widget.height,
+              width: 100.w,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              )); // TODO : Beim Laden ist unten kein Opacity
+        }
+      },
+    );
+  }
+
+  Widget gridView(List<dynamic> lists) {
+    return SizedBox(
+      height: widget.height,
+      child: AnimationLimiter(
+        child: GridView.builder(
+          itemCount: lists.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1,
+              crossAxisSpacing: 8.w,
+              mainAxisSpacing: 5.w),
+          itemBuilder: (context, index) {
+
+            var list = lists[index];
+
+            return AnimationConfiguration.staggeredGrid(
+              columnCount: 2,
+              position: index,
+              child: ListWidget(
+                list: CustomList(
+                  list['listID'],
+                  list['listname'],
+                  const Color(0xFFaff463),  // TODO : Konstante entfernen und Code korigieren
+                  list['emoji'],
+                  list['created_at'],
+                  list['ownerID'],
+                ),
+                onTap: () {
+
+                },
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

@@ -8,9 +8,6 @@ import 'package:http/http.dart' as http;
 
 class Api {
 
-
-  final Constants _constants = Constants();
-
   final String _apiKey = "42bee375-ecaa-4a93-9155-daca80549008";
 
   final http.Response _noConnection = http.Response("Es konnte keine Verbindung zur API hergestellt werden!", 500);
@@ -30,7 +27,7 @@ class Api {
 
 
   Future<http.Response> loginUser(String email, String password) async {
-    final url = Uri.parse('${_constants.domainBaseUrl}/user/login');
+    final url = Uri.parse('${Constants.domainBaseUrl}/user/login');
     final headers = {'Content-Type': 'application/json',
                      'Authorization': _apiKey};
     final data = {'email' : email, 'password': password};
@@ -56,7 +53,7 @@ class Api {
   }
 
   Future<http.Response> registerUser(String username, String email, String password) async {
-    final url = Uri.parse('${_constants.domainBaseUrl}/user/register');
+    final url = Uri.parse('${Constants.domainBaseUrl}/user/register');
     final headers = {'Content-Type': 'application/json',
       'Authorization': _apiKey};
     final data = {'username' : username, 'email' : email, 'password': password};
@@ -82,13 +79,43 @@ class Api {
   }
 
   Future<http.Response> hasUsername(int? userID) async {
-    final url = Uri.parse('${_constants.domainBaseUrl}/user/hasUsername/$userID');
+    final url = Uri.parse('${Constants.domainBaseUrl}/user/hasUsername/$userID');
     final headers = {'Content-Type': 'application/json',
       'Authorization': _apiKey};
 
 
     try {
       final response = await http.post(
+          url, headers: headers).timeout(
+          const Duration(seconds: 5));
+      return response;
+    } catch (e) {
+      if (e is TimeoutException) {
+        // Ein Timeout ist aufgetreten
+        if (kDebugMode) {
+          print('Timeout aufgetreten!');
+        }
+      } else {
+        // Anderer Fehler ist aufgetreten
+        if (kDebugMode) {
+          print('Fehler: $e');
+        }
+      }
+
+      return _noConnection;
+
+    }
+  }
+
+
+  Future<http.Response> getLists(int? userID) async {
+    final url = Uri.parse('${Constants.domainBaseUrl}/list/getUserLists/$userID');
+    final headers = {'Content-Type': 'application/json',
+      'Authorization': _apiKey};
+
+
+    try {
+      final response = await http.get(
           url, headers: headers).timeout(
           const Duration(seconds: 5));
       return response;
