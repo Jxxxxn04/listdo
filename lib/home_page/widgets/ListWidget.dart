@@ -1,14 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 class ListWidget extends StatelessWidget {
   const ListWidget({Key? key, required this.list, this.onTap}) : super(key: key);
 
   final CustomList list;
   final VoidCallback? onTap;
+
 
 
   @override
@@ -21,7 +23,7 @@ class ListWidget extends StatelessWidget {
       ),
       child: Material(
         borderRadius: BorderRadius.circular(10),
-        color: list.getListColor().withOpacity(1.0),
+        color: list.getListColor(),
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: onTap,
@@ -35,7 +37,8 @@ class ListWidget extends StatelessWidget {
                     child: Text(
                       list.getEmoji(),
                       style: TextStyle(
-                          fontSize: 45.sp
+                          fontSize: 45.sp,
+                        fontFamily: GoogleFonts.notoColorEmoji().fontFamily,
                       ),
                     ),
                   )

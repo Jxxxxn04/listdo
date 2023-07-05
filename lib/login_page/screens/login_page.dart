@@ -320,7 +320,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const HomePage()));
+                    builder: (context) => HomePage()));
           },
           child: Center(
             child: Text(
@@ -422,7 +422,14 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 4,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: () {},
+          onTap: () async {
+            final SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove("userID");
+            await prefs.remove("username");
+            await prefs.remove("email");
+            await prefs.remove("created_at");
+            print("prefs wurde erfolgreich geleert!");
+          },
           child: Row(
             children: [
               Padding(padding:EdgeInsets.only(left: 3.5.w, top: 3.5.w, bottom: 3.5.w) ,child: const Image(image: AssetImage("assets/images/apple_logo.png"))),
@@ -459,10 +466,10 @@ class _LoginPageState extends State<LoginPage> {
     http.Response response = await api.loginUser(email, password);
     //print("${response.statusCode} \n ${response.body}");
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Center(
             child: Text(
-                "Status Code: ${response.statusCode.toString()} \n Message: ${response.body}"))));
+                "Status Code: ${response.statusCode.toString()} \n Message: ${response.body}"))));*/
 
     if (response.statusCode == 200) {
       await _onSuccessLogin(response);
@@ -488,11 +495,10 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setString("username", username);
     await prefs.setString("email", email);
     await prefs.setString("created_at", createdAt);
-
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const HomePage()));
+            builder: (context) => HomePage()));
 
     // TODO : Werte in SharedPrefernces speichern
     // TODO : Auf HomePage weiterleiten
