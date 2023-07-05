@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +29,23 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isLoading = false;
 
+
+  Future<bool> isAlreadyLoggedIn(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userID =  prefs.getInt("userID");
+    String? username = prefs.getString("username");
+    String? email = prefs.getString("email");
+    String? createdAt = prefs.getString("created_at");
+
+    if (userID != null && username != null && email != null && createdAt != null && context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, "/homepage", (route) => false);
+      return true;
+    }
+
+    return false;
+
+  }
+
   @override
   void dispose() {
     _passwordTEC.dispose();
@@ -37,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    isAlreadyLoggedIn(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -106,10 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(15),
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterPage()));
+                    Navigator.pushNamed(context, '/register');
                   },
                   child: Center(
                     child: Text(text,
@@ -285,7 +301,9 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 6,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: _loginFunction,  // TODO : Login
+          onTap: () {
+            _loginFunction(context);
+          },  // TODO : Login
           child: Center(
             child: Text(
               text,
@@ -317,10 +335,7 @@ class _LoginPageState extends State<LoginPage> {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HomePage()));
+            Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
           },
           child: Center(
             child: Text(
@@ -382,10 +397,7 @@ class _LoginPageState extends State<LoginPage> {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CookiePage()));
+
           },
           child: Row(
             children: [
@@ -428,7 +440,9 @@ class _LoginPageState extends State<LoginPage> {
             await prefs.remove("username");
             await prefs.remove("email");
             await prefs.remove("created_at");
-            print("prefs wurde erfolgreich geleert!");
+            if (kDebugMode) {
+              print("prefs wurde erfolgreich geleert!");
+            }
           },
           child: Row(
             children: [
@@ -454,7 +468,7 @@ class _LoginPageState extends State<LoginPage> {
 
 
   //Funktionen
-  void _loginFunction() async {
+  void _loginFunction(BuildContext context) async {
     setState(() {
       isLoading = true;
     });
@@ -471,8 +485,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Text(
                 "Status Code: ${response.statusCode.toString()} \n Message: ${response.body}"))));*/
 
-    if (response.statusCode == 200) {
-      await _onSuccessLogin(response);
+    if (response.statusCode == 200 && context.mounted) {
+      await _onSuccessLogin(response, context);
     }
 
     setState(() {
@@ -480,7 +494,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  Future<void> _onSuccessLogin(http.Response response) async {
+  Future<void> _onSuccessLogin(http.Response response, BuildContext context) async {
     Map<String, dynamic> jsonMap = jsonDecode(response.body);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -495,15 +509,11 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setString("username", username);
     await prefs.setString("email", email);
     await prefs.setString("created_at", createdAt);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomePage()));
-
-    // TODO : Werte in SharedPrefernces speichern
-    // TODO : Auf HomePage weiterleiten
-
-
+    if(context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, "/homepage", (route) => false);
+    }
   }
+
+
 
 }

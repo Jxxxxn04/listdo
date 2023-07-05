@@ -18,10 +18,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
-      return const MaterialApp(
+      return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        home: LoginPage()
+        initialRoute: '/login',
+        routes: {
+          // When navigating to the "/" route, build the FirstScreen widget.
+          '/login': (context) => const LoginPage(),
+          // When navigating to the "/second" route, build the SecondScreen widget.
+          '/homepage': (context) => HomePage(),
+          '/register': (context) => const RegisterPage()
+        },
       );
     }
     );

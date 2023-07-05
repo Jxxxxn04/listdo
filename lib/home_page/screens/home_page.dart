@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../api.dart';
@@ -22,7 +24,7 @@ class HomePage extends StatelessWidget {
       body: Column(
         children: [_appBar(), _body()],
       ),
-      endDrawer: _endDrawer(),
+      endDrawer: _EndDrawer(scaffoldKey: scaffoldKey,),
       endDrawerEnableOpenDragGesture: false,
     );
   }
@@ -74,8 +76,10 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _endDrawer extends StatelessWidget {
-  const _endDrawer({super.key});
+class _EndDrawer extends StatelessWidget {
+  const _EndDrawer({super.key, required this.scaffoldKey});
+
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +97,46 @@ class _endDrawer extends StatelessWidget {
             color: const Color(0xFF252525),
             child: Column(
               children: [
-                _bigProfilePicture()
+                Padding(padding: EdgeInsets.only(top: 5.w)),
+                Padding(padding: EdgeInsets.only(left: 5.w) ,child: Row(children: [Align(alignment: Alignment.centerLeft ,child: _backSpaceButton()), const Spacer()],)),
+                _bigProfilePicture(),
+                Padding(padding: EdgeInsets.only(top: 10.w, left: 5.w, right: 5.w) ,child: _welcomeTextWidget()),
+                Expanded(child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CustomTextButton(height: 6.h, width: 100.w, text: "Einstellungen", color: Colors.transparent, textpadding: EdgeInsets.only(left: 8.w), onTap: () {},),
+                    CustomTextButton(height: 6.h, width: 100.w, text: "Benachrichtigungen", color: Colors.transparent, textpadding: EdgeInsets.only(left: 8.w), onTap: () {},),
+                    CustomTextButton(height: 6.h, width: 100.w, text: "Abmelden", color: Colors.transparent, textpadding: EdgeInsets.only(left: 8.w), splashColor: Colors.red, textColor: Colors.redAccent, onTap: () {_logout(context);},),
+                  ],
+                )),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _backSpaceButton() {
+    return Container(
+      height: 12.w,
+      width: 12.w,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFF604949)
+      ),
+      child: Material(
+        borderRadius: BorderRadius.circular(100),
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(100),
+          onTap: () {
+            scaffoldKey.currentState?.closeEndDrawer();
+          },
+          child: Icon(
+            Icons.arrow_forward_ios_rounded,
+            color: Colors.white,
+            size: 16.sp,
           ),
         ),
       ),
@@ -118,6 +159,54 @@ class _endDrawer extends StatelessWidget {
     );
   }
 
+  Widget _welcomeTextWidget() {
+    return FutureBuilder<String?>(
+      future: getUsername(),
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+        
+        String? username;
+        
+        if (snapshot.hasData) {
+          username = snapshot.data;
+          
+          return AutoSizeText(
+            "Willkommen ${username ?? ''}!",
+            style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 16.sp
+              )
+            ),
+            stepGranularity: 1,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            minFontSize: 14.sp.roundToDouble(),
+          );
+        }
+        
+        // TODO : Error behandeln
+
+        else {
+          return const CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Future<String?> getUsername() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("username");
+  }
+
+  void _logout(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("userID");
+    prefs.remove("username");
+    prefs.remove("email");
+    prefs.remove("created_at");
+    if(context.mounted) Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
 }
 
 
@@ -220,7 +309,7 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
           widget.loadingKey.currentState?.setLoadingStatusFalse();
           return Text(
             snapshot.error.toString(),
-            style: TextStyle(color: Colors.red),
+            style: const TextStyle(color: Colors.red),
           );
         } else if (snapshot.hasData) {
           widget.loadingKey.currentState?.setLoadingStatusFalse();

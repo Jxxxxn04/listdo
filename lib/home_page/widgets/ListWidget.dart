@@ -56,9 +56,9 @@ class ListWidget extends StatelessWidget {
                       fontSize: 14.sp,
                     ),
                     maxLines: 1,
+                    stepGranularity: 1,
                     overflow: TextOverflow.ellipsis,
-                    minFontSize: 12,
-
+                    minFontSize: 12.sp.roundToDouble(),
                   ),
                 ),
               ),
