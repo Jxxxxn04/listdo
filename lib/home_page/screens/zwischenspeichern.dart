@@ -3,51 +3,26 @@ import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import 'package:http/http.dart' as http;
 
 import '../../api.dart';
 import '../../constants.dart';
 import '../widgets/home_page_widgets.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
-  final GlobalKey<_HomePageCreateListAnimationState> createListAnimation =
-      GlobalKey<_HomePageCreateListAnimationState>();
-
-  void refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      body: Stack(
-        children: [
-          Column(
-            children: [_appBar(), _body(context)],
-          ),
-          Positioned(
-            bottom: 0,
-            child: _HomePageCreateListAnimation(
-              key: createListAnimation,
-              function: refresh,
-            ),
-          ),
-        ],
-      ),
+      body: _body(context),
       endDrawer: _EndDrawer(
         scaffoldKey: scaffoldKey,
       ),
@@ -87,48 +62,67 @@ class _HomePageState extends State<HomePage> {
     final GlobalKey<_HomePageButtonState> homePageButton =
     GlobalKey<_HomePageButtonState>();
 
-    return Stack(
-      children: [
-        const _GradientBackground(),
-        _LoadingBackground(
-          key: loadinBackgroundKey,
-        ),
-        _HomePageListBody(
-          height: 74.h,
-          loadingKey: loadinBackgroundKey,
-        ),
-        _LoadingBackground(
-          key: loadinForegroundKey,
-        ),
-        Positioned(
-            bottom: 11.h,
-            child: _HomePagePopupAnimation(
-              key: popupAnimationKey,
-              homePageButton: homePageButton,
-              createListAnimation: createListAnimation,
-            )),
-        Positioned(
+    final GlobalKey<_HomePageCreateListAnimationState> createListAnimation =
+    GlobalKey<_HomePageCreateListAnimationState>();
+
+    return SizedBox(
+      height: 100.h,
+      width: 100.w,
+      child: Stack(
+        children: [
+          const Positioned(bottom: 0, child: _GradientBackground()),
+          _LoadingBackground(
+            key: loadinBackgroundKey,
+          ),
+          Positioned(
             bottom: 0,
-            child: Stack(children: [
-              const RoundedNavigationBar(backgroundColor: Color(0xFF352f3b)),
-              _NavigationBar(
-                scaffoldKey: scaffoldKey,
-                popupAnimationKey: popupAnimationKey,
+            child: _HomePageListBody(
+              height: 74.h,
+              loadingKey: loadinBackgroundKey,
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            child: _LoadingBackground(
+              key: loadinForegroundKey,
+            ),
+          ),
+          Positioned(
+              bottom: 11.h,
+              child: _HomePagePopupAnimation(
+                key: popupAnimationKey,
                 homePageButton: homePageButton,
+                createListAnimation: createListAnimation,
+              )),
+          Positioned(
+              bottom: 0,
+              child: Stack(children: [
+                const RoundedNavigationBar(backgroundColor: Color(0xFF352f3b)),
+                _NavigationBar(
+                  scaffoldKey: scaffoldKey,
+                  popupAnimationKey: popupAnimationKey,
+                  homePageButton: homePageButton,
+                  loadingkey: loadinForegroundKey,
+                )
+              ])),
+          _appBar(),
+          Positioned(
+              bottom: 5.5.h,
+              right: 41.5.w,
+              left: 41.5.w,
+              child: _HomePageButton(
+                key: homePageButton,
                 loadingkey: loadinForegroundKey,
-                function: refresh,
-              )
-            ])),
-        Positioned(
-            bottom: 5.5.h,
-            right: 41.5.w,
-            left: 41.5.w,
-            child: _HomePageButton(
-              key: homePageButton,
-              loadingkey: loadinForegroundKey,
-              popupAnimationKey: popupAnimationKey,
-            )),
-      ],
+                popupAnimationKey: popupAnimationKey,
+              )),
+          Positioned(
+            bottom: 0,
+            child: _HomePageCreateListAnimation(
+              key: createListAnimation,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -200,7 +194,7 @@ class _EndDrawer extends StatelessWidget {
                           },
                         ),
                       ],
-                )),
+                    )),
               ],
             ),
           ),
@@ -413,7 +407,7 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
           widget.loadingKey.currentState?.setLoadingStatusFalse();
           // Konvertiere den JSON-Response in ein Dart-Map-Objekt
           Map<String, dynamic> response =
-              json.decode(snapshot.data!.body.toString());
+          json.decode(snapshot.data!.body.toString());
 
           // Extrahiere das 'lists'-Array aus dem Response
           List<dynamic> lists = response['lists'];
@@ -421,7 +415,7 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
           return isEmpty ? isEmptyWidget() : gridView(lists, widget.loadingKey);
         } else {
           return SizedBox(
-              //color: Colors.black.withOpacity(0.7),
+            //color: Colors.black.withOpacity(0.7),
               height: widget.height,
               width: 100.w,
               child: const Center(
@@ -454,6 +448,7 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
       List<dynamic> lists, GlobalKey<_LoadingBackgroundState> loadingKey) {
     return SizedBox(
       height: widget.height,
+      width: 100.w,
       child: AnimationLimiter(
         child: GridView.builder(
           padding: EdgeInsets.all(10.w),
@@ -525,9 +520,8 @@ class _NavigationBar extends StatelessWidget {
     required this.scaffoldKey,
     required this.homePageButton,
     required this.popupAnimationKey,
-    required this.loadingkey, required this.function});
+    required this.loadingkey});
 
-  final VoidCallback function;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final GlobalKey<_HomePageButtonState> homePageButton;
   final GlobalKey<_HomePagePopupAnimationState> popupAnimationKey;
@@ -567,7 +561,6 @@ class _NavigationBar extends StatelessWidget {
             size: 34.sp,
           ),
           onTap: () {
-            function();
             homePageButton.currentState?.setIconToAdd();
             popupAnimationKey.currentState?.stopAnimation();
             loadingkey.currentState?.setLoadingStatusFalse();
@@ -814,9 +807,7 @@ class _HomePagePopupAnimationState extends State<_HomePagePopupAnimation> {
 }
 
 class _HomePageCreateListAnimation extends StatefulWidget {
-  const _HomePageCreateListAnimation({super.key, required this.function});
-
-  final VoidCallback function;
+  const _HomePageCreateListAnimation({super.key});
 
   @override
   State<_HomePageCreateListAnimation> createState() =>
@@ -827,72 +818,7 @@ class _HomePageCreateListAnimationState
     extends State<_HomePageCreateListAnimation> {
   final TextEditingController input = TextEditingController();
 
-  Api api = Api();
-
   bool _isAnimationStarted = false;
-  bool _hasGradientBackground = true;
-  Color? _createListAnimationBackgroundColor;
-  GlobalKey<ColoredSquareState>? _selectedKey;
-
-  //ColoredSquare Keys to controll selected Color when creating a List
-  final GlobalKey<ColoredSquareState> _redSquareKey =
-      GlobalKey<ColoredSquareState>();
-  final GlobalKey<ColoredSquareState> _yellowSquareKey =
-      GlobalKey<ColoredSquareState>();
-  final GlobalKey<ColoredSquareState> _blueSquareKey =
-      GlobalKey<ColoredSquareState>();
-  final GlobalKey<ColoredSquareState> _pinkSquareKey =
-      GlobalKey<ColoredSquareState>();
-  final GlobalKey<ColoredSquareState> _magentaSquareKey =
-      GlobalKey<ColoredSquareState>();
-  final GlobalKey<ColoredSquareState> _lightGreenSquareKey =
-      GlobalKey<ColoredSquareState>();
-  final GlobalKey<ColoredSquareState> _darkBlueSquareKey =
-      GlobalKey<ColoredSquareState>();
-
-  //unselects every coloredSquare and select the given one. And it returns the current used key
-  GlobalKey<ColoredSquareState> _selectColorController(
-      GlobalKey<ColoredSquareState> key) {
-    _redSquareKey.currentState?.unSelectItem();
-    _yellowSquareKey.currentState?.unSelectItem();
-    _blueSquareKey.currentState?.unSelectItem();
-    _pinkSquareKey.currentState?.unSelectItem();
-    _magentaSquareKey.currentState?.unSelectItem();
-    _lightGreenSquareKey.currentState?.unSelectItem();
-    _darkBlueSquareKey.currentState?.unSelectItem();
-    key.currentState?.selectItem();
-
-    return key;
-  }
-
-  //Checks whether the ColoredSquare is already selected
-  bool _checkForSelectedColoredSquare(GlobalKey<ColoredSquareState> key) {
-    return _selectedKey == key;
-  }
-
-  //Um den Hintergrund zu ändern
-  void _changeCreateListAnimationBackgroundColor(Color color) {
-    setState(() {
-      _hasGradientBackground = false;
-      _createListAnimationBackgroundColor = color;
-    });
-  }
-
-  void _resetBackgroundAndColoredSquares() {
-    setState(() {
-      _hasGradientBackground = true;
-      _createListAnimationBackgroundColor = null;
-    });
-
-    //Unselect every ColoreSquare
-    _redSquareKey.currentState?.unSelectItem();
-    _yellowSquareKey.currentState?.unSelectItem();
-    _blueSquareKey.currentState?.unSelectItem();
-    _pinkSquareKey.currentState?.unSelectItem();
-    _magentaSquareKey.currentState?.unSelectItem();
-    _lightGreenSquareKey.currentState?.unSelectItem();
-    _darkBlueSquareKey.currentState?.unSelectItem();
-  }
 
   @override
   void dispose() {
@@ -925,10 +851,12 @@ class _HomePageCreateListAnimationState
       width: 100.w,
       child: Stack(
         children: [
-          gestureDetector(context),
           Positioned(
               bottom: MediaQuery.of(context).viewInsets.bottom,
-              child: animationWidget(context))
+              child: gestureDetector(context)),
+          Positioned(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              child: animationWidget())
         ],
       ),
     );
@@ -949,80 +877,37 @@ class _HomePageCreateListAnimationState
     );
   }
 
-  Widget animationWidget(BuildContext context) {
+  Widget animationWidget() {
     return AnimatedContainer(
-      height: _isAnimationStarted ? 60.h : 0,
+      height: _isAnimationStarted ? 50.h : 0,
       width: 100.w,
       curve: Curves.fastLinearToSlowEaseIn,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          gradient: _hasGradientBackground
-              ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                      Constants.linearGradientTopColor,
-                      Constants.linearGradientBottomColor
-                    ])
-              : LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                      _createListAnimationBackgroundColor!,
-                      _createListAnimationBackgroundColor!
-                    ])),
+          gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Constants.linearGradientTopColor,
+                Constants.linearGradientBottomColor
+              ])),
       duration: const Duration(milliseconds: 500),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 5.h,
-            ),
-            textWidget(),
-            SizedBox(
-              height: 2.5.h,
-            ),
-            emojiInputWidget(),
-            SizedBox(
-              height: 2.5.h,
-            ),
-            textFormField(context),
-            SizedBox(
-              height: 4.h,
-            ),
-            coloredSquaresWidget(),
-            SizedBox(
-              height: 4.h,
-            ),
-            CustomTextButton(
-              height: 7.h,
-              width: 84.w,
-              text: "Erstellen",
-              color: const Color(0xFF4E4E4E),
-              onTap: createList,
-              alignment: Alignment.center,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            SizedBox(height: 1.h,),
-            CustomTextButton(
-              height: 6.h,
-              width: 50.w,
-              text: "Abbrechen",
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(15),
-              alignment: Alignment.center,
-              onTap: stopAnimation,
-              style: GoogleFonts.poppins(
-                textStyle: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Colors.white,
-                  fontSize: 12.sp
-                ),
-              ),
-            ),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 5.h,
+          ),
+          textWidget(),
+          SizedBox(
+            height: 2.5.h,
+          ),
+          emojiInputWidget(),
+          SizedBox(
+            height: 2.5.h,
+          ),
+          textFormField(),
+        ],
       ),
     );
   }
@@ -1043,7 +928,7 @@ class _HomePageCreateListAnimationState
       height: 18.w,
       width: 18.w,
       decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF4E4E4E)),
+      const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF4E4E4E)),
       child: Material(
         borderRadius: BorderRadius.circular(100),
         color: Colors.transparent,
@@ -1060,231 +945,13 @@ class _HomePageCreateListAnimationState
     );
   }
 
-  Widget textFormField(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 8.w),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Listen Name:",
-                  style: GoogleFonts.poppins(
-                      textStyle:
-                          TextStyle(color: Colors.white, fontSize: 14.sp)),
-                ),
-              ),
-            ),
-            const Spacer()
-          ],
-        ),
-        SizedBox(
-          height: 0.5.h,
-        ),
-        Form(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: TextFormField(
-              controller: input,
-              decoration: InputDecoration(
-                  labelText: "Liste",
-                  labelStyle: TextStyle(
-                      color: const Color(0xFFB0B0B0), fontSize: 15.sp),
-                  fillColor: const Color(0xFFE8E8E8),
-                  filled: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF696969), width: 3)),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(
-                          color: Color(0xFF696969), width: 20)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(
-                          color: Color(0xFF696969), width: 3))),
-              keyboardType: TextInputType.text,
-              inputFormatters: [
-                FilteringTextInputFormatter(RegExp("\\s"), allow: false),
-                LengthLimitingTextInputFormatter(30)
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  Widget textFormField() {
+    return Form(
+      child: TextFormField(
 
-  Widget coloredSquaresWidget() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        ColoredSquare(
-          key: _redSquareKey,
-          color: Constants.redColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_redSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _redSquareKey;
-              _selectColorController(_redSquareKey);
-              _changeCreateListAnimationBackgroundColor(Constants.redColor);
-            }
-          },
-        ),
-        ColoredSquare(
-          key: _yellowSquareKey,
-          color: Constants.yellowColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_yellowSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _yellowSquareKey;
-              _selectColorController(_yellowSquareKey);
-              _changeCreateListAnimationBackgroundColor(Constants.yellowColor);
-            }
-          },
-        ),
-        ColoredSquare(
-          key: _blueSquareKey,
-          color: Constants.blueColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_blueSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _blueSquareKey;
-              _selectColorController(_blueSquareKey);
-              _changeCreateListAnimationBackgroundColor(Constants.blueColor);
-            }
-          },
-        ),
-        ColoredSquare(
-          key: _pinkSquareKey,
-          color: Constants.pinkColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_pinkSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _pinkSquareKey;
-              _selectColorController(_pinkSquareKey);
-              _changeCreateListAnimationBackgroundColor(Constants.pinkColor);
-            }
-          },
-        ),
-        ColoredSquare(
-          key: _magentaSquareKey,
-          color: Constants.magentaColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_magentaSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _magentaSquareKey;
-              _selectColorController(_magentaSquareKey);
-              _changeCreateListAnimationBackgroundColor(Constants.magentaColor);
-            }
-          },
-        ),
-        ColoredSquare(
-          key: _lightGreenSquareKey,
-          color: Constants.lightGreenColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_lightGreenSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _lightGreenSquareKey;
-              _selectColorController(_lightGreenSquareKey);
-              _changeCreateListAnimationBackgroundColor(
-                  Constants.lightGreenColor);
-            }
-          },
-        ),
-        ColoredSquare(
-          key: _darkBlueSquareKey,
-          color: Constants.darkBlueColor,
-          size: 9.w,
-          onTap: () {
-            //If Square is already selected go back to standard background and unselect the ColoredSquare
-            if (_checkForSelectedColoredSquare(_darkBlueSquareKey)) {
-              _selectedKey = null;
-              _resetBackgroundAndColoredSquares();
-            } else {
-              _selectedKey = _darkBlueSquareKey;
-              _selectColorController(_darkBlueSquareKey);
-              _changeCreateListAnimationBackgroundColor(
-                  Constants.darkBlueColor);
-            }
-          },
-        ),
-      ],
+      ),
     );
   }
 
   void openEmojiKeyboard() {}
-
-  void createList() async {
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? ownerID = prefs.getInt("userID");
-
-    // TODO : handle exception for color being null
-    http.Response response = await api.createList(input.text.toString(), ownerID ?? 0, _returnColorID(_selectedKey?.currentState!.color));
-
-    if(response.statusCode == 201) {
-      stopAnimation();
-      widget.function;
-    }
-
-    print(response.body);
-
-  }
-
-  int _returnColorID(Color? colorCode) {
-    const Color redColor = Color(0xFFFF8888);
-    const Color yellowColor = Color(0xFFFFD952);
-    const Color blueColor = Color(0xFF52C1FF);
-    const Color pinkColor = Color(0xFFFF88F3);
-    const Color magentaColor = Color(0xFFD988FF);
-    const Color lightGreenColor = Color(0xFFA4D3A9);
-    const Color darkBlueColor = Color(0xFF7785FF);
-
-    if (colorCode == redColor) {
-      return 1;
-    } else if (colorCode == yellowColor) {
-      return 2;
-    } else if (colorCode == blueColor) {
-      return 3;
-    } else if (colorCode == pinkColor) {
-      return 4;
-    } else if (colorCode == magentaColor) {
-      return 5;
-    } else if (colorCode == lightGreenColor) {
-      return 6;
-    } else if (colorCode == darkBlueColor) {
-      return 7;
-    } else {
-      return 8;
-    }
-  }
-
 }

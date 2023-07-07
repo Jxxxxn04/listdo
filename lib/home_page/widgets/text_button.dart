@@ -15,7 +15,8 @@ class CustomTextButton extends StatelessWidget {
       this.onTap,
       this.textColor,
       this.borderRadius,
-      this.alignment});
+      this.alignment,
+      this.style});
 
   final double height;
   final double width;
@@ -27,6 +28,7 @@ class CustomTextButton extends StatelessWidget {
   final VoidCallback? onTap;
   final BorderRadius? borderRadius;
   final AlignmentGeometry? alignment;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +49,12 @@ class CustomTextButton extends StatelessWidget {
               padding: textpadding ?? EdgeInsets.zero,
               child: Text(
                 text,
-                style: GoogleFonts.poppins(
+                style: style ?? GoogleFonts.poppins(
                     textStyle: TextStyle(
-                  color: textColor ?? Colors.white,
-                  fontSize: 14.sp,
-                )),
+                      color: textColor ?? Colors.white,
+                      fontSize: 14.sp,
+                    )
+                ),
               ),
             ),
           ),

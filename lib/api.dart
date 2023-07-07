@@ -113,6 +113,32 @@ class Api {
     }
   }
 
+  Future<http.Response> createList(String listname, int ownerID, int colorID) async {
+    final url = Uri.parse('${Constants.domainBaseUrl}/list/create');
+    final headers = {'Content-Type': 'application/json',
+      'Authorization': _apiKey};
+    final data = {'listname' : listname, 'ownerID' : ownerID, 'color': colorID};
+
+
+    try {
+      final response = await http.post(
+          url, headers: headers, body: jsonEncode(data)).timeout(
+          const Duration(seconds: 5));
+      return response;
+    } catch (e) {
+      if (e is TimeoutException) {
+        // Ein Timeout ist aufgetreten
+        print('Timeout aufgetreten!');
+      } else {
+        // Anderer Fehler ist aufgetreten
+        print('Fehler: $e');
+      }
+
+      return _noConnection;
+
+    }
+  }
+
 
 
 
