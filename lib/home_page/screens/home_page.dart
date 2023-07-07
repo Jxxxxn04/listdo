@@ -23,9 +23,11 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       key: scaffoldKey,
       body: Column(
-        children: [_appBar(), _body()],
+        children: [_appBar(), _body(context)],
       ),
-      endDrawer: _EndDrawer(scaffoldKey: scaffoldKey,),
+      endDrawer: _EndDrawer(
+        scaffoldKey: scaffoldKey,
+      ),
       endDrawerEnableOpenDragGesture: false,
     );
   }
@@ -49,12 +51,21 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _body() {
+  Widget _body(BuildContext context) {
     final GlobalKey<_LoadingBackgroundState> loadinBackgroundKey =
-        GlobalKey<_LoadingBackgroundState>();
+    GlobalKey<_LoadingBackgroundState>();
 
     final GlobalKey<_LoadingBackgroundState> loadinForegroundKey =
     GlobalKey<_LoadingBackgroundState>();
+
+    final GlobalKey<_HomePagePopupAnimationState> popupAnimationKey =
+    GlobalKey<_HomePagePopupAnimationState>();
+
+    final GlobalKey<_HomePageButtonState> homePageButton =
+    GlobalKey<_HomePageButtonState>();
+
+    final GlobalKey<_HomePageCreateListAnimationState> createListAnimation =
+    GlobalKey<_HomePageCreateListAnimationState>();
 
     return Stack(
       children: [
@@ -62,30 +73,49 @@ class HomePage extends StatelessWidget {
         _LoadingBackground(
           key: loadinBackgroundKey,
         ),
-
+        _HomePageListBody(
+          height: 74.h,
+          loadingKey: loadinBackgroundKey,
+        ),
+        _LoadingBackground(
+          key: loadinForegroundKey,
+        ),
+        Positioned(
+            bottom: 11.h,
+            child: _HomePagePopupAnimation(
+              key: popupAnimationKey,
+              homePageButton: homePageButton,
+              createListAnimation: createListAnimation,
+            )),
         Positioned(
             bottom: 0,
             child: Stack(children: [
               const RoundedNavigationBar(backgroundColor: Color(0xFF352f3b)),
               _NavigationBar(
                 scaffoldKey: scaffoldKey,
+                popupAnimationKey: popupAnimationKey,
+                homePageButton: homePageButton,
+                loadingkey: loadinForegroundKey,
               )
             ])),
-
-        _HomePageListBody(
-          height: 74.h,
-          loadingKey: loadinBackgroundKey,
-        ),
-
-        _LoadingBackground(
-          key: loadinForegroundKey,
-        ),
-
         Positioned(
-          bottom: 5.5.h,
-          right: 41.5.w,
-          left: 41.5.w,
-          child: _HomePageButton(loadingkey: loadinForegroundKey,))
+            bottom: 5.5.h,
+            right: 41.5.w,
+            left: 41.5.w,
+            child: _HomePageButton(
+              key: homePageButton,
+              loadingkey: loadinForegroundKey,
+              popupAnimationKey: popupAnimationKey,
+            )),
+        Positioned(
+          bottom: MediaQuery
+              .of(context)
+              .viewInsets
+              .bottom,
+          child: _HomePageCreateListAnimation(
+            key: createListAnimation,
+          ),
+        ),
       ],
     );
   }
@@ -101,9 +131,7 @@ class _EndDrawer extends StatelessWidget {
     return SafeArea(
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            bottomLeft: Radius.circular(16)
-        ),
+            topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
         child: Drawer(
           width: 80.w,
           child: Container(
@@ -113,16 +141,53 @@ class _EndDrawer extends StatelessWidget {
             child: Column(
               children: [
                 Padding(padding: EdgeInsets.only(top: 5.w)),
-                Padding(padding: EdgeInsets.only(left: 5.w) ,child: Row(children: [Align(alignment: Alignment.centerLeft ,child: _backSpaceButton()), const Spacer()],)),
+                Padding(
+                    padding: EdgeInsets.only(left: 5.w),
+                    child: Row(
+                      children: [
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: _backSpaceButton()),
+                        const Spacer()
+                      ],
+                    )),
                 _bigProfilePicture(),
-                Padding(padding: EdgeInsets.only(top: 10.w, left: 5.w, right: 5.w) ,child: _welcomeTextWidget()),
-                Expanded(child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomTextButton(height: 6.h, width: 100.w, text: "Einstellungen", color: Colors.transparent, textpadding: EdgeInsets.only(left: 8.w), onTap: () {},),
-                    CustomTextButton(height: 6.h, width: 100.w, text: "Benachrichtigungen", color: Colors.transparent, textpadding: EdgeInsets.only(left: 8.w), onTap: () {},),
-                    CustomTextButton(height: 6.h, width: 100.w, text: "Abmelden", color: Colors.transparent, textpadding: EdgeInsets.only(left: 8.w), splashColor: Colors.red, textColor: Colors.redAccent, onTap: () {_logout(context);},),
-                  ],
+                Padding(
+                    padding: EdgeInsets.only(top: 10.w, left: 5.w, right: 5.w),
+                    child: _welcomeTextWidget()),
+                Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CustomTextButton(
+                          height: 6.h,
+                          width: 100.w,
+                          text: "Einstellungen",
+                          color: Colors.transparent,
+                          textpadding: EdgeInsets.only(left: 8.w),
+                          onTap: () {},
+                        ),
+                        CustomTextButton(
+                          height: 6.h,
+                          width: 100.w,
+                          text: "Benachrichtigungen",
+                          color: Colors.transparent,
+                          textpadding: EdgeInsets.only(left: 8.w),
+                          onTap: () {},
+                        ),
+                        CustomTextButton(
+                          height: 6.h,
+                          width: 100.w,
+                          text: "Abmelden",
+                          color: Colors.transparent,
+                          textpadding: EdgeInsets.only(left: 8.w),
+                          splashColor: Colors.red,
+                          textColor: Colors.redAccent,
+                          onTap: () {
+                            _logout(context);
+                          },
+                        ),
+                      ],
                 )),
               ],
             ),
@@ -136,10 +201,8 @@ class _EndDrawer extends StatelessWidget {
     return Container(
       height: 12.w,
       width: 12.w,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: Color(0xFF604949)
-      ),
+      decoration:
+      const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF604949)),
       child: Material(
         borderRadius: BorderRadius.circular(100),
         color: Colors.transparent,
@@ -165,9 +228,7 @@ class _EndDrawer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
         child: const Image(
-          image: AssetImage(
-            "assets/images/equality_.png"
-          ),
+          image: AssetImage("assets/images/equality_.png"),
           fit: BoxFit.cover,
         ),
       ),
@@ -178,20 +239,15 @@ class _EndDrawer extends StatelessWidget {
     return FutureBuilder<String?>(
       future: getUsername(),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-        
         String? username;
-        
+
         if (snapshot.hasData) {
           username = snapshot.data;
-          
+
           return AutoSizeText(
             "Willkommen ${username ?? ''}!",
             style: GoogleFonts.poppins(
-              textStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 16.sp
-              )
-            ),
+                textStyle: TextStyle(color: Colors.white, fontSize: 16.sp)),
             stepGranularity: 1,
             maxLines: 1,
             textAlign: TextAlign.center,
@@ -199,7 +255,7 @@ class _EndDrawer extends StatelessWidget {
             minFontSize: 14.sp.roundToDouble(),
           );
         }
-        
+
         // TODO : Error behandeln
 
         else {
@@ -220,10 +276,10 @@ class _EndDrawer extends StatelessWidget {
     prefs.remove("username");
     prefs.remove("email");
     prefs.remove("created_at");
-    if(context.mounted) Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    if (context.mounted)
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 }
-
 
 class _GradientBackground extends StatelessWidget {
   const _GradientBackground({super.key});
@@ -294,10 +350,13 @@ class _LoadingBackgroundState extends State<_LoadingBackground> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 85.h,
-      width: 100.w,
-      color: _isLoading ? Colors.black.withOpacity(0.6) : Colors.transparent,
+    return Visibility(
+      visible: _isLoading,
+      child: Container(
+        height: 85.h,
+        width: 100.w,
+        color: Colors.black.withOpacity(0.6),
+      ),
     );
   }
 }
@@ -362,10 +421,10 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
   }
 
   Widget isEmptyWidget() {
-    return Container(
+    widget.loadingKey.currentState?.changeLoadingStatus();
+    return SizedBox(
       height: widget.height,
       width: 100.w,
-      color: Colors.black.withOpacity(0.7),
       child: Center(
         child: Text(
           "Keine Listen Vorhanden",
@@ -450,9 +509,16 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
 }
 
 class _NavigationBar extends StatelessWidget {
-  const _NavigationBar({super.key, required this.scaffoldKey});
+  const _NavigationBar({super.key,
+    required this.scaffoldKey,
+    required this.homePageButton,
+    required this.popupAnimationKey,
+    required this.loadingkey});
 
   final GlobalKey<ScaffoldState> scaffoldKey;
+  final GlobalKey<_HomePageButtonState> homePageButton;
+  final GlobalKey<_HomePagePopupAnimationState> popupAnimationKey;
+  final GlobalKey<_LoadingBackgroundState> loadingkey;
 
   @override
   Widget build(BuildContext context) {
@@ -463,17 +529,17 @@ class _NavigationBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          homeIcon(),
+          homeIcon(context),
           SizedBox(
             width: 25.w,
           ),
-          profileIcon()
+          profileIcon(context)
         ],
       ),
     );
   }
 
-  Widget homeIcon() {
+  Widget homeIcon(BuildContext context) {
     return SizedBox(
       height: 7.h,
       width: 15.w,
@@ -487,13 +553,17 @@ class _NavigationBar extends StatelessWidget {
             color: Colors.white,
             size: 34.sp,
           ),
-          onTap: () {},
+          onTap: () {
+            homePageButton.currentState?.setIconToAdd();
+            popupAnimationKey.currentState?.stopAnimation();
+            loadingkey.currentState?.setLoadingStatusFalse();
+          },
         ),
       ),
     );
   }
 
-  Widget profileIcon() {
+  Widget profileIcon(BuildContext context) {
     return Stack(
       children: [
         Container(
@@ -514,15 +584,16 @@ class _NavigationBar extends StatelessWidget {
         Container(
           width: 15.w,
           height: 15.w,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(100)
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(100)),
           child: Material(
             borderRadius: BorderRadius.circular(100),
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(100),
               onTap: () {
+                homePageButton.currentState?.setIconToAdd();
+                popupAnimationKey.currentState?.stopAnimation();
+                loadingkey.currentState?.setLoadingStatusFalse();
                 scaffoldKey.currentState?.openEndDrawer();
               },
             ),
@@ -534,9 +605,11 @@ class _NavigationBar extends StatelessWidget {
 }
 
 class _HomePageButton extends StatefulWidget {
-  const _HomePageButton({super.key, required this.loadingkey});
+  const _HomePageButton(
+      {super.key, required this.loadingkey, required this.popupAnimationKey});
 
   final GlobalKey<_LoadingBackgroundState> loadingkey;
+  final GlobalKey<_HomePagePopupAnimationState> popupAnimationKey;
 
   @override
   State<_HomePageButton> createState() => _HomePageButtonState();
@@ -555,7 +628,7 @@ class _HomePageButtonState extends State<_HomePageButton> {
     });
   }
 
-  void setIconToAdd() {
+  void setIconToClose() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
@@ -565,7 +638,7 @@ class _HomePageButtonState extends State<_HomePageButton> {
     });
   }
 
-  void setIconToClose() {
+  void setIconToAdd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
@@ -580,14 +653,7 @@ class _HomePageButtonState extends State<_HomePageButton> {
       setState(() {
         _isIconExpanded = !_isIconExpanded;
         widget.loadingkey.currentState?.changeLoadingStatus();
-        /*showModalBottomSheet(context: context, builder: (context) {
-            return Container(
-              height: 80.h,
-              width: 100.w,
-              child: Text("blub"),
-            );
-          },
-        );*/
+        widget.popupAnimationKey.currentState?.toggleAnimationStatus();
       });
     }
   }
@@ -632,4 +698,193 @@ class _HomePageButtonState extends State<_HomePageButton> {
       ),
     );
   }
+}
+
+class _HomePagePopupAnimation extends StatefulWidget {
+  const _HomePagePopupAnimation({super.key,
+    required this.homePageButton,
+    required this.createListAnimation});
+
+  final GlobalKey<_HomePageButtonState> homePageButton;
+  final GlobalKey<_HomePageCreateListAnimationState> createListAnimation;
+
+  @override
+  State<_HomePagePopupAnimation> createState() =>
+      _HomePagePopupAnimationState();
+}
+
+class _HomePagePopupAnimationState extends State<_HomePagePopupAnimation> {
+  bool _isAnimationStarted = false;
+
+  void toggleAnimationStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isAnimationStarted = !_isAnimationStarted;
+        });
+      }
+    });
+  }
+
+  void startAnimation() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isAnimationStarted = true;
+        });
+      }
+    });
+  }
+
+  void stopAnimation() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isAnimationStarted = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      height: _isAnimationStarted ? 89.h : 0,
+      width: 100.w,
+      duration: _isAnimationStarted
+          ? const Duration(milliseconds: 100)
+          : Duration.zero,
+      curve: Curves.easeInExpo,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 8.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CustomTextButton(
+              height: 7.h,
+              width: 70.w,
+              text: "Neue Liste",
+              alignment: Alignment.center,
+              color: const Color(0xFF867BFF),
+              borderRadius: BorderRadius.circular(15),
+              onTap: () => createListFunction(context),
+            ),
+            SizedBox(
+              height: 3.h,
+            ),
+            CustomTextButton(
+              height: 7.h,
+              width: 70.w,
+              text: "Liste beitreten",
+              alignment: Alignment.center,
+              color: const Color(0xFF87C5FF),
+              borderRadius: BorderRadius.circular(15),
+              onTap: joinListFunction,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void createListFunction(BuildContext context) {
+    widget.homePageButton.currentState?.toggleCreateListMenu(context);
+    widget.createListAnimation.currentState?.startAnimation();
+  }
+
+  void joinListFunction() {
+    // TODO : Stop the popupAnimation
+    // TODO : Start the InviteAnimation
+  }
+}
+
+class _HomePageCreateListAnimation extends StatefulWidget {
+  const _HomePageCreateListAnimation({super.key});
+
+  @override
+  State<_HomePageCreateListAnimation> createState() =>
+      _HomePageCreateListAnimationState();
+}
+
+class _HomePageCreateListAnimationState
+    extends State<_HomePageCreateListAnimation> {
+  bool _isAnimationStarted = false;
+
+  void toggleAnimationStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isAnimationStarted = !_isAnimationStarted;
+        });
+      }
+    });
+  }
+
+  void startAnimation() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isAnimationStarted = true;
+        });
+      }
+    });
+  }
+
+  void stopAnimation(BuildContext context) {
+
+      print("blub2");
+      if (context.mounted) {
+        print("blub3");
+        setState(() {
+          _isAnimationStarted = false;
+        });
+      }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        gestureDetector(context),
+        Positioned(bottom: MediaQuery
+            .of(context)
+            .viewInsets
+            .bottom, child: animationWidget())
+      ],
+    );
+  }
+
+  // Er reagiert wenn man außerhalb des Widgets klickt
+  Widget gestureDetector(BuildContext context) {
+    return Visibility(
+      visible: _isAnimationStarted,
+      child: GestureDetector(
+        onTap: () => stopAnimation(context),
+        child: Container(
+          height: 85.h,
+          width: 100.w,
+          color: Colors.black.withOpacity(0.6),
+        ),
+      ),
+    );
+  }
+
+  Widget animationWidget() {
+    return AnimatedContainer(
+      height: _isAnimationStarted ? 50.h : 0,
+      width: 100.w,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Constants.linearGradientTopColor,
+                Constants.linearGradientBottomColor
+              ])),
+      duration: const Duration(milliseconds: 350),
+    );
+  }
+
 }
