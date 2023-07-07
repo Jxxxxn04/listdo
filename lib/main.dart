@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:listdo/start_page.dart';
 import 'package:sizer/sizer.dart';
 
 import 'screens.dart';
 
-void main() {
+void main() async {
+  await Future.delayed(const Duration(milliseconds: 200));
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((value) => runApp(const MyApp()));
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -21,11 +22,10 @@ class MyApp extends StatelessWidget {
       return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        initialRoute: '/login',
+        initialRoute: '/startpage',
         routes: {
-          // When navigating to the "/" route, build the FirstScreen widget.
+          '/startpage': (context) => const StartPage(),
           '/login': (context) => const LoginPage(),
-          // When navigating to the "/second" route, build the SecondScreen widget.
           '/homepage': (context) => HomePage(),
           '/register': (context) => const RegisterPage()
         },

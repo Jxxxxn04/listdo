@@ -79,36 +79,6 @@ class Api {
     }
   }
 
-  Future<http.Response> hasUsername(int? userID) async {
-    final url = Uri.parse('${Constants.domainBaseUrl}/user/hasUsername/$userID');
-    final headers = {'Content-Type': 'application/json',
-      'Authorization': _apiKey};
-
-
-    try {
-      final response = await http.post(
-          url, headers: headers).timeout(
-          const Duration(seconds: 5));
-      return response;
-    } catch (e) {
-      if (e is TimeoutException) {
-        // Ein Timeout ist aufgetreten
-        if (kDebugMode) {
-          print('Timeout aufgetreten!');
-        }
-      } else {
-        // Anderer Fehler ist aufgetreten
-        if (kDebugMode) {
-          print('Fehler: $e');
-        }
-      }
-
-      return _noConnection;
-
-    }
-  }
-
-
   Future<http.Response> getLists() async {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();

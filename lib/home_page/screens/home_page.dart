@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -52,25 +53,39 @@ class HomePage extends StatelessWidget {
     final GlobalKey<_LoadingBackgroundState> loadinBackgroundKey =
         GlobalKey<_LoadingBackgroundState>();
 
+    final GlobalKey<_LoadingBackgroundState> loadinForegroundKey =
+    GlobalKey<_LoadingBackgroundState>();
+
     return Stack(
       children: [
         const _GradientBackground(),
         _LoadingBackground(
           key: loadinBackgroundKey,
         ),
-         Positioned(
+
+        Positioned(
             bottom: 0,
             child: Stack(children: [
               const RoundedNavigationBar(backgroundColor: Color(0xFF352f3b)),
-              _NavigationBar(scaffoldKey: scaffoldKey,)
+              _NavigationBar(
+                scaffoldKey: scaffoldKey,
+              )
             ])),
-        // 11.h
+
         _HomePageListBody(
           height: 74.h,
           loadingKey: loadinBackgroundKey,
         ),
 
-        // TODO : CreateList Button
+        _LoadingBackground(
+          key: loadinForegroundKey,
+        ),
+
+        Positioned(
+          bottom: 5.5.h,
+          right: 41.5.w,
+          left: 41.5.w,
+          child: _HomePageButton(loadingkey: loadinForegroundKey,))
       ],
     );
   }
@@ -243,26 +258,38 @@ class _LoadingBackgroundState extends State<_LoadingBackground> {
 
   void changeLoadingStatus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isLoading = !_isLoading;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = !_isLoading;
+        });
+      }
     });
   }
 
   void setLoadingStatusTrue() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
     });
   }
 
   void setLoadingStatusFalse() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     });
+  }
+
+  void test() {
+    if (kDebugMode) {
+      print("blub");
+    }
   }
 
   @override
@@ -502,6 +529,107 @@ class _NavigationBar extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+}
+
+class _HomePageButton extends StatefulWidget {
+  const _HomePageButton({super.key, required this.loadingkey});
+
+  final GlobalKey<_LoadingBackgroundState> loadingkey;
+
+  @override
+  State<_HomePageButton> createState() => _HomePageButtonState();
+}
+
+class _HomePageButtonState extends State<_HomePageButton> {
+  bool _isIconExpanded = false;
+
+  void changeIconStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isIconExpanded = !_isIconExpanded;
+        });
+      }
+    });
+  }
+
+  void setIconToAdd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isIconExpanded = true;
+        });
+      }
+    });
+  }
+
+  void setIconToClose() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isIconExpanded = false;
+        });
+      }
+    });
+  }
+
+  void toggleCreateListMenu(BuildContext context) {
+    if (mounted) {
+      setState(() {
+        _isIconExpanded = !_isIconExpanded;
+        widget.loadingkey.currentState?.changeLoadingStatus();
+        /*showModalBottomSheet(context: context, builder: (context) {
+            return Container(
+              height: 80.h,
+              width: 100.w,
+              child: Text("blub"),
+            );
+          },
+        );*/
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 17.w,
+      width: 17.w,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFF905BFF),
+      ),
+      child: Material(
+        borderRadius: BorderRadius.circular(100),
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(100),
+          onTap: () {
+            toggleCreateListMenu(context);
+          },
+          child: Center(
+            child: AnimatedCrossFade(
+                firstCurve: Curves.linear,
+                secondCurve: Curves.linear,
+                duration: const Duration(milliseconds: 100),
+                firstChild: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 30.sp,
+                ),
+                secondChild: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 30.sp,
+                ),
+                crossFadeState: _isIconExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst),
+          ),
+        ),
+      ),
     );
   }
 }

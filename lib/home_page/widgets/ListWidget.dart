@@ -11,12 +11,11 @@ class ListWidget extends StatelessWidget {
   final CustomList list;
   final VoidCallback? onTap;
 
-
-
   @override
   Widget build(BuildContext context) {
+    //int emoji = int.parse(list.getEmoji());
+    //emoji = int.parse("0x") + emoji;
     return Container(
-
       decoration: BoxDecoration(
           color: list.getListColor(),
           borderRadius: BorderRadius.circular(10)
@@ -26,7 +25,9 @@ class ListWidget extends StatelessWidget {
         color: list.getListColor(),
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: onTap,
+          onTap: () {
+            //print(String.fromCharCode(emoji));
+          },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -38,7 +39,6 @@ class ListWidget extends StatelessWidget {
                       list.getEmoji(),
                       style: TextStyle(
                           fontSize: 45.sp,
-                        fontFamily: GoogleFonts.notoColorEmoji().fontFamily,
                       ),
                     ),
                   )

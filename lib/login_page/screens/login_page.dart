@@ -29,23 +29,6 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isLoading = false;
 
-
-  Future<bool> isAlreadyLoggedIn(BuildContext context) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? userID =  prefs.getInt("userID");
-    String? username = prefs.getString("username");
-    String? email = prefs.getString("email");
-    String? createdAt = prefs.getString("created_at");
-
-    if (userID != null && username != null && email != null && createdAt != null && context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, "/homepage", (route) => false);
-      return true;
-    }
-
-    return false;
-
-  }
-
   @override
   void dispose() {
     _passwordTEC.dispose();
@@ -55,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    isAlreadyLoggedIn(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
