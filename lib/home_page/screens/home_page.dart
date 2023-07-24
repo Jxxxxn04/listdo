@@ -7,28 +7,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 
 import '../../api.dart';
 import '../../constants.dart';
+import '../providers/list_provider.dart';
 import '../widgets/home_page_widgets.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   final GlobalKey<_HomePageCreateListAnimationState> createListAnimation =
       GlobalKey<_HomePageCreateListAnimationState>();
-
-  void refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +38,6 @@ class _HomePageState extends State<HomePage> {
             bottom: 0,
             child: _HomePageCreateListAnimation(
               key: createListAnimation,
-              function: refresh,
             ),
           ),
         ],
@@ -116,7 +110,6 @@ class _HomePageState extends State<HomePage> {
                 popupAnimationKey: popupAnimationKey,
                 homePageButton: homePageButton,
                 loadingkey: loadinForegroundKey,
-                function: refresh,
               )
             ])),
         Positioned(
@@ -390,7 +383,7 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: api.getLists(),
+      future: api.getLists(context),
       builder: (context, snapshot) {
         widget.loadingKey.currentState?.setLoadingStatusTrue();
 
@@ -417,6 +410,11 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
 
           // Extrahiere das 'lists'-Array aus dem Response
           List<dynamic> lists = response['lists'];
+
+
+
+
+
           bool isEmpty = response['isEmpty'];
           return isEmpty ? isEmptyWidget() : gridView(lists, widget.loadingKey);
         } else {
@@ -426,7 +424,7 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
               width: 100.w,
               child: const Center(
                 child: CircularProgressIndicator(),
-              )); // TODO : Beim Laden ist unten kein Opacity
+              ));
         }
       },
     );
@@ -466,22 +464,35 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
           itemBuilder: (context, index) {
             var list = lists[index];
 
+
+            ListWidget listWidget = ListWidget(
+              list: CustomList(
+                list['listID'],
+                list['listname'],
+                _returnColorCode(list['color']),
+                list['emoji'],
+                list['created_at'],
+                list['ownerID'],
+              ),
+              onTap: () {
+                // TODO : In Liste reingehen
+              },
+            );
+
+            WidgetsBinding
+                .instance
+                .addPostFrameCallback((_){
+              context.read<ListProvider>().addList(listWidget);
+            }
+            );
+
+
+
+
             return AnimationConfiguration.staggeredGrid(
               columnCount: 2,
               position: index,
-              child: ListWidget(
-                list: CustomList(
-                  list['listID'],
-                  list['listname'],
-                  _returnColorCode(list['color']),
-                  list['emoji'],
-                  list['created_at'],
-                  list['ownerID'],
-                ),
-                onTap: () {
-                  // TODO : In Liste reingehen
-                },
-              ),
+              child: context.watch<ListProvider>().getLists[index],
             );
           },
         ),
@@ -525,9 +536,8 @@ class _NavigationBar extends StatelessWidget {
     required this.scaffoldKey,
     required this.homePageButton,
     required this.popupAnimationKey,
-    required this.loadingkey, required this.function});
+    required this.loadingkey});
 
-  final VoidCallback function;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final GlobalKey<_HomePageButtonState> homePageButton;
   final GlobalKey<_HomePagePopupAnimationState> popupAnimationKey;
@@ -567,7 +577,6 @@ class _NavigationBar extends StatelessWidget {
             size: 34.sp,
           ),
           onTap: () {
-            function();
             homePageButton.currentState?.setIconToAdd();
             popupAnimationKey.currentState?.stopAnimation();
             loadingkey.currentState?.setLoadingStatusFalse();
@@ -814,9 +823,8 @@ class _HomePagePopupAnimationState extends State<_HomePagePopupAnimation> {
 }
 
 class _HomePageCreateListAnimation extends StatefulWidget {
-  const _HomePageCreateListAnimation({super.key, required this.function});
+  const _HomePageCreateListAnimation({super.key});
 
-  final VoidCallback function;
 
   @override
   State<_HomePageCreateListAnimation> createState() =>
@@ -1252,8 +1260,31 @@ class _HomePageCreateListAnimationState
 
     if(response.statusCode == 201) {
       stopAnimation();
-      widget.function;
+      ListWidget listWidget = ListWidget(
+        list: CustomList(
+          2, // TODO : Die ListID muss man noch von der API zurückkriegen
+          input.text.toString(),
+          _selectedKey?.currentState!.color ?? Colors.black,
+          "\u{af35d}",
+          "sd",
+          2
+        ),
+        onTap: () {
+          // TODO : In Liste reingehen
+        },
+      );
+
+
+      WidgetsBinding
+          .instance
+          .addPostFrameCallback((_){
+        context.watch()<ListProvider>().addList(listWidget);
+        print("sdad");
+      }
+      );
     }
+
+    FocusManager.instance.primaryFocus?.unfocus();
 
     print(response.body);
 

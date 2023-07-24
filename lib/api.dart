@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -79,7 +80,7 @@ class Api {
     }
   }
 
-  Future<http.Response> getLists() async {
+  Future<http.Response> getLists(BuildContext context) async {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -88,6 +89,9 @@ class Api {
     final url = Uri.parse('${Constants.domainBaseUrl}/list/getUserLists/$userID');
     final headers = {'Content-Type': 'application/json',
       'Authorization': _apiKey};
+
+
+
 
 
     try {

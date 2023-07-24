@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:listdo/start_page.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import 'home_page/providers/list_provider.dart';
 import 'screens.dart';
 
 void main() async {
@@ -11,7 +13,13 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
-  ]).then((value) => runApp(const MyApp()));
+  ]).then((value) => runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ListProvider()),
+        ],
+        child: const MyApp()
+      )));
 }
 
 class MyApp extends StatelessWidget {
