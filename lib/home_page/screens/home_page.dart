@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart' as emoji;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,16 +72,16 @@ class HomePage extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     final GlobalKey<_LoadingBackgroundState> loadinBackgroundKey =
-    GlobalKey<_LoadingBackgroundState>();
+        GlobalKey<_LoadingBackgroundState>();
 
     final GlobalKey<_LoadingBackgroundState> loadinForegroundKey =
-    GlobalKey<_LoadingBackgroundState>();
+        GlobalKey<_LoadingBackgroundState>();
 
     final GlobalKey<_HomePagePopupAnimationState> popupAnimationKey =
-    GlobalKey<_HomePagePopupAnimationState>();
+        GlobalKey<_HomePagePopupAnimationState>();
 
     final GlobalKey<_HomePageButtonState> homePageButton =
-    GlobalKey<_HomePageButtonState>();
+        GlobalKey<_HomePageButtonState>();
 
     return Stack(
       children: [
@@ -162,37 +164,37 @@ class _EndDrawer extends StatelessWidget {
                     child: _welcomeTextWidget()),
                 Expanded(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CustomTextButton(
-                          height: 6.h,
-                          width: 100.w,
-                          text: "Einstellungen",
-                          color: Colors.transparent,
-                          textpadding: EdgeInsets.only(left: 8.w),
-                          onTap: () {},
-                        ),
-                        CustomTextButton(
-                          height: 6.h,
-                          width: 100.w,
-                          text: "Benachrichtigungen",
-                          color: Colors.transparent,
-                          textpadding: EdgeInsets.only(left: 8.w),
-                          onTap: () {},
-                        ),
-                        CustomTextButton(
-                          height: 6.h,
-                          width: 100.w,
-                          text: "Abmelden",
-                          color: Colors.transparent,
-                          textpadding: EdgeInsets.only(left: 8.w),
-                          splashColor: Colors.red,
-                          textColor: Colors.redAccent,
-                          onTap: () {
-                            _logout(context);
-                          },
-                        ),
-                      ],
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CustomTextButton(
+                      height: 6.h,
+                      width: 100.w,
+                      text: "Einstellungen",
+                      color: Colors.transparent,
+                      textpadding: EdgeInsets.only(left: 8.w),
+                      onTap: () {},
+                    ),
+                    CustomTextButton(
+                      height: 6.h,
+                      width: 100.w,
+                      text: "Benachrichtigungen",
+                      color: Colors.transparent,
+                      textpadding: EdgeInsets.only(left: 8.w),
+                      onTap: () {},
+                    ),
+                    CustomTextButton(
+                      height: 6.h,
+                      width: 100.w,
+                      text: "Abmelden",
+                      color: Colors.transparent,
+                      textpadding: EdgeInsets.only(left: 8.w),
+                      splashColor: Colors.red,
+                      textColor: Colors.redAccent,
+                      onTap: () {
+                        _logout(context);
+                      },
+                    ),
+                  ],
                 )),
               ],
             ),
@@ -207,7 +209,7 @@ class _EndDrawer extends StatelessWidget {
       height: 12.w,
       width: 12.w,
       decoration:
-      const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF604949)),
+          const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF604949)),
       child: Material(
         borderRadius: BorderRadius.circular(100),
         color: Colors.transparent,
@@ -378,8 +380,7 @@ class _HomePageListBody extends StatefulWidget {
 }
 
 class _HomePageListBodyState extends State<_HomePageListBody> {
-  Api api = Api();
-
+  final Api api = Api();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -411,11 +412,30 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
           // Extrahiere das 'lists'-Array aus dem Response
           List<dynamic> lists = response['lists'];
 
-
-
-
-
           bool isEmpty = response['isEmpty'];
+
+          for(var list in lists) {
+            ListWidget listWidget = ListWidget(
+              list: CustomList(
+                list['listID'],
+                list['listname'],
+                _returnColorCode(list['color']),
+                list['emoji'],
+                list['created_at'],
+                list['ownerID'],
+              ),
+              onTap: () {
+                // TODO : In Liste reingehen
+              },
+            );
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Provider.of<ListProvider>(context, listen: false).addList(listWidget);
+            });
+          }
+
+
+          // TODO : if empty and list is created it wont be shown unless restarted
           return isEmpty ? isEmptyWidget() : gridView(lists, widget.loadingKey);
         } else {
           return SizedBox(
@@ -450,53 +470,30 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
 
   Widget gridView(
       List<dynamic> lists, GlobalKey<_LoadingBackgroundState> loadingKey) {
-    return SizedBox(
-      height: widget.height,
-      child: AnimationLimiter(
-        child: GridView.builder(
-          padding: EdgeInsets.all(10.w),
-          itemCount: lists.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-              crossAxisSpacing: 7.w,
-              mainAxisSpacing: 5.w),
-          itemBuilder: (context, index) {
-            var list = lists[index];
-
-
-            ListWidget listWidget = ListWidget(
-              list: CustomList(
-                list['listID'],
-                list['listname'],
-                _returnColorCode(list['color']),
-                list['emoji'],
-                list['created_at'],
-                list['ownerID'],
-              ),
-              onTap: () {
-                // TODO : In Liste reingehen
+    return Consumer<ListProvider>(
+      builder: (context, listProvider, child) {
+        return SizedBox(
+          height: widget.height,
+          child: AnimationLimiter(
+            child: GridView.builder(
+              padding: EdgeInsets.all(10.w),
+              itemCount: listProvider.lists.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 7.w,
+                  mainAxisSpacing: 5.w),
+              itemBuilder: (context, index) {
+                return AnimationConfiguration.staggeredGrid(
+                  columnCount: 2,
+                  position: index,
+                  child: listProvider.lists[index],
+                );
               },
-            );
-
-            WidgetsBinding
-                .instance
-                .addPostFrameCallback((_){
-              context.read<ListProvider>().addList(listWidget);
-            }
-            );
-
-
-
-
-            return AnimationConfiguration.staggeredGrid(
-              columnCount: 2,
-              position: index,
-              child: context.watch<ListProvider>().getLists[index],
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -532,11 +529,12 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
 }
 
 class _NavigationBar extends StatelessWidget {
-  const _NavigationBar({super.key,
-    required this.scaffoldKey,
-    required this.homePageButton,
-    required this.popupAnimationKey,
-    required this.loadingkey});
+  const _NavigationBar(
+      {super.key,
+      required this.scaffoldKey,
+      required this.homePageButton,
+      required this.popupAnimationKey,
+      required this.loadingkey});
 
   final GlobalKey<ScaffoldState> scaffoldKey;
   final GlobalKey<_HomePageButtonState> homePageButton;
@@ -724,9 +722,10 @@ class _HomePageButtonState extends State<_HomePageButton> {
 }
 
 class _HomePagePopupAnimation extends StatefulWidget {
-  const _HomePagePopupAnimation({super.key,
-    required this.homePageButton,
-    required this.createListAnimation});
+  const _HomePagePopupAnimation(
+      {super.key,
+      required this.homePageButton,
+      required this.createListAnimation});
 
   final GlobalKey<_HomePageButtonState> homePageButton;
   final GlobalKey<_HomePageCreateListAnimationState> createListAnimation;
@@ -825,7 +824,6 @@ class _HomePagePopupAnimationState extends State<_HomePagePopupAnimation> {
 class _HomePageCreateListAnimation extends StatefulWidget {
   const _HomePageCreateListAnimation({super.key});
 
-
   @override
   State<_HomePageCreateListAnimation> createState() =>
       _HomePageCreateListAnimationState();
@@ -837,6 +835,9 @@ class _HomePageCreateListAnimationState
 
   Api api = Api();
 
+  bool _emojiKeyboardShowing = false;
+  bool _hasEmoji = false;
+  String _emoji = "";
   bool _isAnimationStarted = false;
   bool _hasGradientBackground = true;
   Color? _createListAnimationBackgroundColor;
@@ -924,6 +925,7 @@ class _HomePageCreateListAnimationState
     setState(() {
       _isAnimationStarted = false;
     });
+    closeEmojiKeyboard();
   }
 
   @override
@@ -936,7 +938,9 @@ class _HomePageCreateListAnimationState
           gestureDetector(context),
           Positioned(
               bottom: MediaQuery.of(context).viewInsets.bottom,
-              child: animationWidget(context))
+              child: Stack(children: [
+                animationWidget(context),
+                Positioned(bottom: 0, child: emojiKeyboard())]))
         ],
       ),
     );
@@ -1012,7 +1016,9 @@ class _HomePageCreateListAnimationState
               alignment: Alignment.center,
               borderRadius: BorderRadius.circular(15),
             ),
-            SizedBox(height: 1.h,),
+            SizedBox(
+              height: 1.h,
+            ),
             CustomTextButton(
               height: 6.h,
               width: 50.w,
@@ -1023,10 +1029,9 @@ class _HomePageCreateListAnimationState
               onTap: stopAnimation,
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Colors.white,
-                  fontSize: 12.sp
-                ),
+                    decoration: TextDecoration.underline,
+                    color: Colors.white,
+                    fontSize: 12.sp),
               ),
             ),
           ],
@@ -1058,7 +1063,17 @@ class _HomePageCreateListAnimationState
         child: InkWell(
           borderRadius: BorderRadius.circular(100),
           onTap: openEmojiKeyboard,
-          child: Icon(
+          child: _hasEmoji ?
+              Center(
+                child: Text(
+                  _emoji,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 38.sp,
+                  ),
+                ),
+              )
+              :Icon(
             Icons.add,
             color: Colors.white,
             size: 36.sp,
@@ -1248,46 +1263,53 @@ class _HomePageCreateListAnimationState
     );
   }
 
-  void openEmojiKeyboard() {}
+  void closeEmojiKeyboard() {
+    setState(() {
+      _emojiKeyboardShowing = false;
+    });
+  }
+
+  void openEmojiKeyboard() {
+    setState(() {
+      _emojiKeyboardShowing = true;
+    });
+  }
 
   void createList() async {
-
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int? ownerID = prefs.getInt("userID");
 
     // TODO : handle exception for color being null
-    http.Response response = await api.createList(input.text.toString(), ownerID ?? 0, _returnColorID(_selectedKey?.currentState!.color));
+    http.Response response = await api.createList(input.text.toString(),
+        ownerID ?? 0, _returnColorID(_selectedKey?.currentState!.color), _emoji);
 
-    if(response.statusCode == 201) {
+    if (response.statusCode == 201) {
       stopAnimation();
+      // Get the current date and time
+      DateTime now = DateTime.now();
+
+      // Format the date and time to the desired format
+      String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+
       ListWidget listWidget = ListWidget(
         list: CustomList(
-          2, // TODO : Die ListID muss man noch von der API zurückkriegen
-          input.text.toString(),
-          _selectedKey?.currentState!.color ?? Colors.black,
-          "\u{af35d}",
-          "sd",
-          2
-        ),
+            2, // TODO : Die ListID muss man noch von der API zurückkriegen
+            input.text.toString(),
+            _selectedKey?.currentState!.color ?? Colors.black,
+            _emoji,
+            formattedDateTime,
+            ownerID!),
         onTap: () {
           // TODO : In Liste reingehen
         },
       );
 
-
-      WidgetsBinding
-          .instance
-          .addPostFrameCallback((_){
-        context.watch()<ListProvider>().addList(listWidget);
-        print("sdad");
-      }
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Provider.of<ListProvider>(context, listen: false).addList(listWidget);
+      });
     }
 
     FocusManager.instance.primaryFocus?.unfocus();
-
-    print(response.body);
-
   }
 
   int _returnColorID(Color? colorCode) {
@@ -1316,6 +1338,65 @@ class _HomePageCreateListAnimationState
     } else {
       return 8;
     }
+  }
+
+  Widget emojiKeyboard() {
+    return Stack(
+      children: [
+
+        SizedBox(
+          height: _emojiKeyboardShowing ? 100.h : 0,
+          width: 100.w,
+          child: GestureDetector(
+            onTap: closeEmojiKeyboard,
+          ),
+        ),
+
+        Positioned(
+          bottom: 0,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            color: Colors.transparent,
+            height: _emojiKeyboardShowing ? 37.h : 0,
+            width: 100.w,
+            child: emoji.EmojiPicker(
+              onEmojiSelected: (category, emoji) {
+                setState(() {
+                  _hasEmoji = true;
+                  _emoji = emoji.emoji;
+                });
+              },
+              config: emoji.Config(
+                columns: 8,
+                emojiSizeMax: 32 *
+                    (defaultTargetPlatform ==
+                        TargetPlatform.iOS
+                        ? 1.30
+                        : 1.0),
+                verticalSpacing: 0,
+                horizontalSpacing: 0,
+                gridPadding: EdgeInsets.zero,
+                initCategory: emoji.Category.SMILEYS,
+                bgColor: const Color(0xFFF2F2F2),
+                indicatorColor: Colors.blue,
+                iconColor: Colors.grey,
+                iconColorSelected: Colors.blue,
+                backspaceColor: Colors.blue,
+                skinToneDialogBgColor: Colors.white,
+                skinToneIndicatorColor: Colors.grey,
+                enableSkinTones: true,
+                recentTabBehavior: emoji.RecentTabBehavior.NONE,
+                loadingIndicator: const SizedBox.shrink(),
+                tabIndicatorAnimDuration: kTabScrollDuration,
+                categoryIcons: const emoji.CategoryIcons(),
+                buttonMode: emoji.ButtonMode.MATERIAL,
+                checkPlatformCompatibility: true,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
 }

@@ -117,11 +117,11 @@ class Api {
     }
   }
 
-  Future<http.Response> createList(String listname, int ownerID, int colorID) async {
+  Future<http.Response> createList(String listname, int ownerID, int colorID, String emoji) async {
     final url = Uri.parse('${Constants.domainBaseUrl}/list/create');
     final headers = {'Content-Type': 'application/json',
       'Authorization': _apiKey};
-    final data = {'listname' : listname, 'ownerID' : ownerID, 'color': colorID};
+    final data = {'listname' : listname, 'ownerID' : ownerID, 'color': colorID, 'emoji' : emoji};
 
 
     try {

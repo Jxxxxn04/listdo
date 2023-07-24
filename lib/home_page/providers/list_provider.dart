@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../widgets/ListWidget.dart';
 
 
-class ListProvider with ChangeNotifier {
+class ListProvider extends ChangeNotifier {
 
   List<ListWidget> _lists = [];
 
 
-  List<ListWidget> get getLists => _lists;
+  List<ListWidget> get lists => _lists;
 
   void addMultipleLists(List<ListWidget> lists) {
     _lists.addAll(lists);
