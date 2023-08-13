@@ -27,16 +27,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
+      return const MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        initialRoute: '/startpage',
-        routes: {
-          '/startpage': (context) => const StartPage(),
-          '/login': (context) => const LoginPage(),
-          '/homepage': (context) => HomePage(),
-          '/register': (context) => const RegisterPage()
-        },
+        home: StartPage(),
       );
     }
     );

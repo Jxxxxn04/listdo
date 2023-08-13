@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:listdo/home_page/screens/home_page.dart';
+import 'package:listdo/login_page/screens/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StartPage extends StatelessWidget {
@@ -12,9 +14,17 @@ class StartPage extends StatelessWidget {
     String? createdAt = prefs.getString("created_at");
 
     if (userID != null && username != null && email != null && createdAt != null && context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, "/homepage", (route) => false);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage(),),
+            (route) => false,
+      );
     } else {
-      Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage(),),
+            (route) => false,
+      );
     }
 
 

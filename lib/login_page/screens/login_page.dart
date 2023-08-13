@@ -107,7 +107,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(15),
                   onTap: () {
-                    Navigator.pushNamed(context, '/register');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage(),)
+                    );
                   },
                   child: Center(
                     child: Text(text,
@@ -317,7 +320,11 @@ class _LoginPageState extends State<LoginPage> {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage(),),
+                  (route) => false,
+            );
           },
           child: Center(
             child: Text(
@@ -492,7 +499,11 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setString("email", email);
     await prefs.setString("created_at", createdAt);
     if(context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, "/homepage", (route) => false);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage(),),
+            (route) => false,
+      );
     }
   }
 

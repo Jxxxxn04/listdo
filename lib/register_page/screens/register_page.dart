@@ -117,7 +117,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(15),
                   onTap: () {
-                    Navigator.pushNamed(context, '/login');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage(),)
+                    );
                   },
                   child: Center(
                     child: Text(text,

@@ -9,6 +9,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
+import 'package:listdo/login_page/screens/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -29,6 +30,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // Clears the listArray before pulling new Lists
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ListProvider>(context, listen: false).clearList();
+    });
+
     return Scaffold(
       key: scaffoldKey,
       body: Stack(
@@ -283,8 +290,13 @@ class _EndDrawer extends StatelessWidget {
     prefs.remove("username");
     prefs.remove("email");
     prefs.remove("created_at");
-    if (context.mounted)
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage(),),
+        (route) => false,
+      );
+    }
   }
 }
 
@@ -424,9 +436,6 @@ class _HomePageListBodyState extends State<_HomePageListBody> {
                 list['created_at'],
                 list['ownerID'],
               ),
-              onTap: () {
-                // TODO : In Liste reingehen
-              },
             );
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1288,20 +1297,21 @@ class _HomePageCreateListAnimationState
       // Get the current date and time
       DateTime now = DateTime.now();
 
+      final responseBody = json.decode(response.body);
+      final int listID = responseBody['listID'];
+
       // Format the date and time to the desired format
       String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
       ListWidget listWidget = ListWidget(
         list: CustomList(
-            2, // TODO : Die ListID muss man noch von der API zurückkriegen
+            listID,
             input.text.toString(),
             _selectedKey?.currentState!.color ?? Colors.black,
             _emoji,
             formattedDateTime,
-            ownerID!),
-        onTap: () {
-          // TODO : In Liste reingehen
-        },
+            ownerID!
+        ),
       );
 
       WidgetsBinding.instance.addPostFrameCallback((_) {

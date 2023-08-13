@@ -2,14 +2,14 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
+import 'package:listdo/list_page/screens/list_page.dart';
 import 'package:sizer/sizer.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 class ListWidget extends StatelessWidget {
-  const ListWidget({Key? key, required this.list, this.onTap}) : super(key: key);
+  const ListWidget({Key? key, required this.list}) : super(key: key);
 
   final CustomList list;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,10 @@ class ListWidget extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            //print(String.fromCharCode(emoji));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ListPage(list: list),)
+            );
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
