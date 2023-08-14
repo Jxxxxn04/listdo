@@ -26,9 +26,9 @@ class ListWidget extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => ListPage(list: list),)
+              MaterialPageRoute(builder: (context) => ListPage(list: list),), (route) => false,
             );
           },
           child: Column(
