@@ -174,9 +174,9 @@ class _ListPageFilterButtonState extends State<ListPageFilterButton> {
             child: InkWell(
               borderRadius: BorderRadius.circular(5),
               onTap: saveFilterOptions,
-              child: Center(
+              child: const Center(
                 child: Icon(
-                  Icons.restore_from_trash
+                  Icons.delete_forever
                 )
               ),
             ),
