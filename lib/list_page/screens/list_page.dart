@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
 import 'package:listdo/home_page/screens/home_page.dart';
 import 'package:listdo/list_page/screens/components/listpage_app_bar.dart';
-import 'package:listdo/list_page/screens/components/listpage_search_button.dart';
+import 'package:listdo/list_page/screens/components/listpage_filter_button.dart';
 import 'package:sizer/sizer.dart';
 
 
@@ -26,7 +26,7 @@ class ListPage extends StatelessWidget {
                 listName: list.getListName(),
             ),
             Center(
-              child: ListPageSearchButton( // height for the search_bar_button is 3.h, width is 35.w
+              child: ListPageFilterButton( // height for the filter_button is 3.h, width is 35.w
                   listColor: list.getListColor(),
               ),
             ),

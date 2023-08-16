@@ -143,68 +143,69 @@ class _EndDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
-        child: Drawer(
+      child: Drawer(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20)),
+        ),
+        width: 80.w,
+        child: Container(
+          height: 100.h,
           width: 80.w,
-          child: Container(
-            height: 100.h,
-            width: 80.w,
-            color: const Color(0xFF252525),
-            child: Column(
-              children: [
-                Padding(padding: EdgeInsets.only(top: 5.w)),
-                Padding(
-                    padding: EdgeInsets.only(left: 5.w),
-                    child: Row(
-                      children: [
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: _backSpaceButton()),
-                        const Spacer()
-                      ],
-                    )),
-                _bigProfilePicture(),
-                Padding(
-                    padding: EdgeInsets.only(top: 10.w, left: 5.w, right: 5.w),
-                    child: _welcomeTextWidget()),
-                Expanded(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomTextButton(
-                      height: 6.h,
-                      width: 100.w,
-                      text: "Einstellungen",
-                      color: Colors.transparent,
-                      textpadding: EdgeInsets.only(left: 8.w),
-                      onTap: () {},
-                    ),
-                    CustomTextButton(
-                      height: 6.h,
-                      width: 100.w,
-                      text: "Benachrichtigungen",
-                      color: Colors.transparent,
-                      textpadding: EdgeInsets.only(left: 8.w),
-                      onTap: () {},
-                    ),
-                    CustomTextButton(
-                      height: 6.h,
-                      width: 100.w,
-                      text: "Abmelden",
-                      color: Colors.transparent,
-                      textpadding: EdgeInsets.only(left: 8.w),
-                      splashColor: Colors.red,
-                      textColor: Colors.redAccent,
-                      onTap: () {
-                        _logout(context);
-                      },
-                    ),
-                  ],
-                )),
-              ],
-            ),
+          color: const Color(0xFF252525),
+          child: Column(
+            children: [
+              Padding(padding: EdgeInsets.only(top: 5.w)),
+              Padding(
+                  padding: EdgeInsets.only(left: 5.w),
+                  child: Row(
+                    children: [
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child: _backSpaceButton()),
+                      const Spacer()
+                    ],
+                  )),
+              _bigProfilePicture(),
+              Padding(
+                  padding: EdgeInsets.only(top: 10.w, left: 5.w, right: 5.w),
+                  child: _welcomeTextWidget()),
+              Expanded(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CustomTextButton(
+                    height: 6.h,
+                    width: 100.w,
+                    text: "Einstellungen",
+                    color: Colors.transparent,
+                    textpadding: EdgeInsets.only(left: 8.w),
+                    onTap: () {},
+                  ),
+                  CustomTextButton(
+                    height: 6.h,
+                    width: 100.w,
+                    text: "Benachrichtigungen",
+                    color: Colors.transparent,
+                    textpadding: EdgeInsets.only(left: 8.w),
+                    onTap: () {},
+                  ),
+                  CustomTextButton(
+                    height: 6.h,
+                    width: 100.w,
+                    text: "Abmelden",
+                    color: Colors.transparent,
+                    textpadding: EdgeInsets.only(left: 8.w),
+                    splashColor: Colors.red,
+                    textColor: Colors.redAccent,
+                    onTap: () {
+                      _logout(context);
+                    },
+                  ),
+                ],
+              )),
+            ],
           ),
         ),
       ),

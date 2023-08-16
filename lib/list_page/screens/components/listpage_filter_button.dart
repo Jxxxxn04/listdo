@@ -1,19 +1,18 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 
-class ListPageSearchButton extends StatefulWidget {
-  const ListPageSearchButton({super.key, required this.listColor});
+class ListPageFilterButton extends StatefulWidget {
+  const ListPageFilterButton({super.key, required this.listColor});
 
   final Color listColor;
 
   @override
-  State<ListPageSearchButton> createState() => _ListPageSearchButtonState();
+  State<ListPageFilterButton> createState() => _ListPageFilterButtonState();
 }
 
-class _ListPageSearchButtonState extends State<ListPageSearchButton> {
+class _ListPageFilterButtonState extends State<ListPageFilterButton> {
 
   bool _isExtended = false;
 
@@ -54,24 +53,6 @@ class _ListPageSearchButtonState extends State<ListPageSearchButton> {
     });
   }
 
-  void extendSearchContainer() {
-    setState(() {
-      _isExtended = true;
-    });
-
-    // TODO : Searchbar ausfahren
-
-  }
-
-  void shrinkSearchContainer() {
-    setState(() {
-      _isExtended = false;
-    });
-
-    // TODO : Searchbar einfahren
-
-  }
-
 
   Widget animatedContainer() {
     return AnimatedContainer(
@@ -90,7 +71,7 @@ class _ListPageSearchButtonState extends State<ListPageSearchButton> {
               SizedBox(height: 2.h,),
               _selectCategories(),
               SizedBox(height: 3.h,),
-              _radioListButtons(),
+              CustomRadioButton()
             ],
           ),
         ),
@@ -152,9 +133,33 @@ class _ListPageSearchButtonState extends State<ListPageSearchButton> {
     );
   }
 
-  Widget _radioListButtons() {
-    List<String> options = ['Vorhandene Einträge', 'Erledigte Einträge'];
-    String currentOption = options[0];
+
+
+
+}
+
+class CustomRadioButton extends StatefulWidget {
+  const CustomRadioButton({super.key});
+
+  @override
+  State<CustomRadioButton> createState() => _CustomRadioButtonState();
+}
+
+class _CustomRadioButtonState extends State<CustomRadioButton> {
+  // Initialize currentOption in initState
+  late String currentOption;
+
+  List<String> options = ["vorhandene", "erledigte"];
+
+  @override
+  void initState() {
+    super.initState();
+    // Move the initialization here
+    currentOption = options[0]; // Initialize to the default value
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Column(
       children: [
@@ -162,25 +167,34 @@ class _ListPageSearchButtonState extends State<ListPageSearchButton> {
           title: const Text("Vorhandene Einträge"),
           value: options[0],
           groupValue: currentOption,
+          controlAffinity: ListTileControlAffinity.trailing,
           onChanged: (value) {
             print(value);
             setState(() {
+
+              // TODO : Liste akutalisieren mit vorhandenen Aufträgen
+
               currentOption = value.toString();
             });
-          },),
+          },
+        ),
         RadioListTile(
           title: const Text("Erledigte Einträge"),
           value: options[1],
           groupValue: currentOption,
+          controlAffinity: ListTileControlAffinity.trailing,
           onChanged: (value) {
             print(value);
             setState(() {
+
+              // TODO : Liste akutalisieren mit erledigten Aufträgen
+
               currentOption = value.toString();
             });
-          },)
+          },
+        )
       ],
     );
   }
-
-
 }
+
