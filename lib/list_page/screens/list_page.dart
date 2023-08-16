@@ -25,10 +25,8 @@ class ListPage extends StatelessWidget {
                 listColor: list.getListColor(),
                 listName: list.getListName(),
             ),
-            Center(
-              child: ListPageFilterButton( // height for the filter_button is 3.h, width is 35.w
-                  listColor: list.getListColor(),
-              ),
+            ListPageFilterButton( // height for the filter_button is 3.h, width is 35.w
+                listColor: list.getListColor(),
             ),
           ],
         ),

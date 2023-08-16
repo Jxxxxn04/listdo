@@ -70,8 +70,12 @@ class _ListPageFilterButtonState extends State<ListPageFilterButton> {
               _lineWithWord("Filter", 3.h),
               SizedBox(height: 2.h,),
               _selectCategories(),
-              SizedBox(height: 3.h,),
-              CustomRadioButton()
+              SizedBox(height: 1.5.h,),
+              CustomRadioButton(
+                listColor: widget.listColor,
+              ),
+              const _CheckBoxes(),
+              _saveAndDiscardFilterOptionsButtons()
             ],
           ),
         ),
@@ -134,12 +138,119 @@ class _ListPageFilterButtonState extends State<ListPageFilterButton> {
   }
 
 
+  Widget _saveAndDiscardFilterOptionsButtons() {
+    return Row(
+      children: [
+        SizedBox(
+          height: 4.h,
+          width: 50.w,
+          child: Material(
+            color: const Color(0xFFFFE7E7),
+            borderRadius: BorderRadius.circular(5),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(5),
+              onTap: saveFilterOptions,
+              child: Center(
+                child: Text(
+                  "Übernehmen",
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF808080),
+                    fontSize: 12.sp
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        const Spacer(),
+
+        SizedBox(
+          height: 8.w,
+          width: 8.w,
+          child: Material(
+            color: const Color(0xFFFFE7E7),
+            borderRadius: BorderRadius.circular(5),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(5),
+              onTap: saveFilterOptions,
+              child: Center(
+                child: Icon(
+                  Icons.restore_from_trash
+                )
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  void saveFilterOptions() {
+
+  }
+
 
 
 }
 
+class _CheckBoxes extends StatefulWidget {
+  const _CheckBoxes({super.key});
+
+  @override
+  State<_CheckBoxes> createState() => _CheckBoxesState();
+}
+
+class _CheckBoxesState extends State<_CheckBoxes> {
+
+  bool upperBoxIsChecked = false;
+  bool lowerBoxIsChecked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Align(alignment: Alignment.centerLeft, child: Text("Zuletzt hinzugefügt:", style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.sp),)),
+            const Spacer(),
+            Checkbox(value: upperBoxIsChecked, onChanged: (value) {
+              setState(() {
+                upperBoxIsChecked = value!;
+              });
+
+              // TODO : Nach zuletzt hinzugefügtem filtern
+
+            },)
+          ],
+        ),
+
+        Row(
+          children: [
+            Align(alignment: Alignment.centerLeft, child: Text("Mir zugewiesen:", style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.sp),)),
+            const Spacer(),
+            Checkbox(value: lowerBoxIsChecked, onChanged: (value) {
+              setState(() {
+                lowerBoxIsChecked = value!;
+              });
+
+              // TODO : Nach zuletzt hinzugefügtem filtern
+
+            },)
+          ],
+        )
+      ],
+    );
+  }
+}
+
+
+
+
 class CustomRadioButton extends StatefulWidget {
-  const CustomRadioButton({super.key});
+  const CustomRadioButton({super.key, required this.listColor});
+
+  final Color listColor;
 
   @override
   State<CustomRadioButton> createState() => _CustomRadioButtonState();
@@ -164,14 +275,17 @@ class _CustomRadioButtonState extends State<CustomRadioButton> {
     return Column(
       children: [
         RadioListTile(
-          title: const Text("Vorhandene Einträge"),
+          title: Text(
+            "Vorhandene Einträge:",
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.sp),
+          ),
           value: options[0],
           groupValue: currentOption,
+          contentPadding: EdgeInsets.symmetric(horizontal: 0.w),
           controlAffinity: ListTileControlAffinity.trailing,
           onChanged: (value) {
             print(value);
             setState(() {
-
               // TODO : Liste akutalisieren mit vorhandenen Aufträgen
 
               currentOption = value.toString();
@@ -179,14 +293,18 @@ class _CustomRadioButtonState extends State<CustomRadioButton> {
           },
         ),
         RadioListTile(
-          title: const Text("Erledigte Einträge"),
+          title: Text(
+            "Erledigte Einträge:",
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.sp),
+          ),
           value: options[1],
           groupValue: currentOption,
           controlAffinity: ListTileControlAffinity.trailing,
+          contentPadding: EdgeInsets.symmetric(horizontal: 0.w),
+
           onChanged: (value) {
             print(value);
             setState(() {
-
               // TODO : Liste akutalisieren mit erledigten Aufträgen
 
               currentOption = value.toString();
