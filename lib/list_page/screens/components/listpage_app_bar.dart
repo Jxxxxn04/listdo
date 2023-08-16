@@ -8,17 +8,15 @@ class ListPageAppBar extends StatelessWidget {
   const ListPageAppBar(
       {super.key,
       required this.listColor,
-      required this.listName,
-      required this.height});
+      required this.listName,});
 
   final Color listColor;
   final String listName;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height,
+      height: 15.h,
       width: 100.w,
       child: Material(
         elevation: 5,

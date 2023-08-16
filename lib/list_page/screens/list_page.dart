@@ -21,16 +21,13 @@ class ListPage extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            ListPageAppBar(
+            ListPageAppBar( // height = 15.h, width = 100.w
                 listColor: list.getListColor(),
                 listName: list.getListName(),
-                height: 15.h
             ),
             Center(
-              child: ListPageSearchButton(
+              child: ListPageSearchButton( // height for the search_bar_button is 3.h, width is 35.w
                   listColor: list.getListColor(),
-                  height: 3.h,
-                  width: 35.w,
               ),
             ),
           ],
