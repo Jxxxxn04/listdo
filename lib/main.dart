@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import 'home_page/providers/list_provider.dart';
+import 'list_page/providers/item_provider.dart';
 import 'screens.dart';
 
 void main() async {
@@ -17,6 +18,7 @@ void main() async {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => ListProvider()),
+          ChangeNotifierProvider(create: (_) => ItemProvider())
         ],
         child: const MyApp()
       )));
