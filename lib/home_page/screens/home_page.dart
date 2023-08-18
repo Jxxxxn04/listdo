@@ -18,7 +18,7 @@ import 'package:http/http.dart' as http;
 import '../../api.dart';
 import '../../constants.dart';
 import '../providers/list_provider.dart';
-import '../widgets/home_page_widgets.dart';
+import '../../widgets/home_page_widgets.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});

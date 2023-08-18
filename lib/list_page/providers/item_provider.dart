@@ -7,6 +7,8 @@ class ItemProvider extends ChangeNotifier {
 
   List<Item> get items => _items;
 
+  double totalPrice = 0;
+
   void addMultipleItems(List<Item> lists) {
     _items.addAll(lists);
     notifyListeners();
@@ -24,6 +26,28 @@ class ItemProvider extends ChangeNotifier {
 
   void clearItems() {
     _items.clear();
+    notifyListeners();
+  }
+
+  void refreshTotalPrice() {
+    for(int i = 0; i < _items.length; i++) {
+      totalPrice += _items[i].price * _items[i].amount;
+    }
+    notifyListeners();
+  }
+
+  void resetTotalPrice() {
+    totalPrice = 0;
+    notifyListeners();
+  }
+
+  void setNewTotalPrice(double newPrice) {
+    totalPrice = newPrice;
+    notifyListeners();
+  }
+
+  void addPriceToTotalPrice(double price) {
+    totalPrice += price;
     notifyListeners();
   }
 

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:listdo/home_page/models/category_colors.dart';
 import 'package:sizer/sizer.dart';
 
-import '../models/item.dart';
+import '../list_page/models/item.dart';
 
 class ListItem extends StatefulWidget {
   const ListItem({super.key, required this.onTap, required this.item, required this.listColor});
@@ -123,9 +123,13 @@ class _ListItemState extends State<ListItem> {
     double totalPrice = widget.item.price * widget.item.amount;
 
     if (totalPrice <= 9999.99) {
-      formattedPrice = NumberFormat("###,##0.00").format(totalPrice);
+      formattedPrice = NumberFormat.currency(
+        symbol: '€',
+        decimalDigits: 2,
+        locale: 'de_DE', // Pass appropriate locale
+      ).format(totalPrice);
     } else {
-      formattedPrice = "9999,99+";
+      formattedPrice = "9999,99+ €";
     }
 
     return SizedBox(
@@ -134,7 +138,7 @@ class _ListItemState extends State<ListItem> {
         children: [
           const Spacer(),
           AutoSizeText(
-            '$formattedPrice €',
+            formattedPrice,
             minFontSize: 10.sp.roundToDouble(),
             stepGranularity: 1,
             overflow: TextOverflow.ellipsis,

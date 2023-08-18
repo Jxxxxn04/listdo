@@ -144,6 +144,29 @@ class Api {
   }
 
 
+  Future<http.Response> getItemsFromList(int listID) async {
+    final url = Uri.parse('${Constants.domainBaseUrl}/list/getItems/$listID');
+    final headers = {'Content-Type': 'application/json',
+      'Authorization': _apiKey};
 
+
+    try {
+      final response = await http.get(
+          url, headers: headers).timeout(
+          const Duration(seconds: 5));
+      return response;
+    } catch (e) {
+      if (e is TimeoutException) {
+        // Ein Timeout ist aufgetreten
+        print('Timeout aufgetreten!');
+      } else {
+        // Anderer Fehler ist aufgetreten
+        print('Fehler: $e');
+      }
+
+      return _noConnection;
+
+    }
+  }
 
 }
