@@ -35,23 +35,26 @@ class _ListPageTotalPriceState extends State<ListPageTotalPrice> {
         width: 100.w,
         color: const Color(0xFFF0F0F0),
         child: Center(
-          child: SizedBox(
-            height: 7.h,
-            width: 90.w,
-            child: Material(
-              color: widget.listColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-              child: InkWell(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 5.w),
+            child: SizedBox(
+              height: 7.h,
+              width: 90.w,
+              child: Material(
+                color: widget.listColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
-                onTap: () {},
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.w),
-                  child: Row(
-                    children: [
-                      Align(alignment: Alignment.centerLeft, child: Text("Summe:", style: GoogleFonts.poppins(color: const Color(0xFF5A5A5A), fontSize: 13.sp),),),
-                      const Spacer(),
-                      Align(alignment: Alignment.centerRight, child: Text("265,44€", style: GoogleFonts.poppins(color: const Color(0xFF5A5A5A), fontSize: 13.sp),),)
-                    ],
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {},
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.w),
+                    child: Row(
+                      children: [
+                        Align(alignment: Alignment.centerLeft, child: Text("Summe:", style: GoogleFonts.poppins(color: const Color(0xFF5A5A5A), fontSize: 13.sp),),),
+                        const Spacer(),
+                        Align(alignment: Alignment.centerRight, child: Text("265,44€", style: GoogleFonts.poppins(color: const Color(0xFF5A5A5A), fontSize: 13.sp),),)
+                      ],
+                    ),
                   ),
                 ),
               ),

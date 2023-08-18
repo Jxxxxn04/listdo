@@ -18,7 +18,7 @@ import 'package:http/http.dart' as http;
 import '../../api.dart';
 import '../../constants.dart';
 import '../providers/list_provider.dart';
-import '../widgets/home_page_widgets.dart';
+import '../../widgets/home_page_widgets.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -1366,7 +1366,7 @@ class _HomePageCreateListAnimationState
         Positioned(
           bottom: 0,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 100),
             color: Colors.transparent,
             height: _emojiKeyboardShowing ? 37.h : 0,
             width: 100.w,

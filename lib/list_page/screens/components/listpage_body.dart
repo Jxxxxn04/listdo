@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:listdo/list_page/providers/item_provider.dart';
-import 'package:listdo/list_page/widgets/ListItem.dart';
+import 'package:listdo/widgets/ListItem.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
