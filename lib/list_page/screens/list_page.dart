@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:listdo/home_page/models/CustomListModel.dart';
 import 'package:listdo/home_page/screens/home_page.dart';
+import 'package:listdo/home_page/widgets/home_page_widgets.dart';
 import 'package:listdo/list_page/screens/components/listpage_app_bar.dart';
-import 'package:listdo/list_page/screens/components/listpage_search_button.dart';
+import 'package:listdo/list_page/screens/components/listpage_body.dart';
+import 'package:listdo/list_page/screens/components/listpage_filter_button.dart';
+import 'package:listdo/list_page/screens/components/listpage_totalprice.dart';
 import 'package:sizer/sizer.dart';
-
 
 class ListPage extends StatelessWidget {
   const ListPage({super.key, required this.list});
@@ -19,17 +21,29 @@ class ListPage extends StatelessWidget {
         return true;
       },
       child: Scaffold(
+        backgroundColor: const Color(0xFFF0F0F0),
         body: Column(
           children: [
-            ListPageAppBar( // height = 15.h, width = 100.w
-                listColor: list.getListColor(),
-                listName: list.getListName(),
+            ListPageAppBar(
+              // height = 15.h, width = 100.w
+              listColor: list.getListColor(),
+              listName: list.getListName(),
             ),
-            Center(
-              child: ListPageSearchButton( // height for the search_bar_button is 3.h, width is 35.w
+
+            Stack(
+              // Body of the ListPage
+              children: [
+                ListPageBody(listColor: list.getListColor(),),  // height = 74.h
+
+                ListPageFilterButton(
+                  // height for the filter_button is 3.h, width is 35.w
                   listColor: list.getListColor(),
-              ),
+                ),
+              ],
             ),
+            ListPageTotalPrice(totalPrice: 2, listColor: list.getListColor()),
+            const RoundedNavigationBar(backgroundColor: Color(0xFF252525))
+            //RoundedNavigationBar height is 11.h
           ],
         ),
       ),

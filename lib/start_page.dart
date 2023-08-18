@@ -20,11 +20,14 @@ class StartPage extends StatelessWidget {
             (route) => false,
       );
     } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage(),),
-            (route) => false,
-      );
+      if (context.mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage(),),
+              (route) => false,
+        );
+      }
+
     }
 
 
