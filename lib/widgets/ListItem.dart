@@ -1,17 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
-import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:listdo/Global_Classes/timer_handler.dart';
 import 'package:listdo/home_page/models/category_colors.dart';
 import 'package:listdo/list_page/providers/item_provider.dart';
-import 'package:numberpicker/numberpicker.dart';
+import 'package:listdo/widgets/inkwell_button.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import '../constants.dart';
 import '../list_page/models/item.dart';
 
 class ListItem extends StatefulWidget {
@@ -30,6 +29,9 @@ class _ListItemState extends State<ListItem> {
 
   late int userID;
   bool _isAssignedToUser = false;
+  bool _isPoppedUp = false;
+  Color backgroundColor = Colors.white;
+  TimerHandler timerHandler = TimerHandler(const Duration(seconds: 2));
 
   @override
   void initState() {
@@ -43,8 +45,11 @@ class _ListItemState extends State<ListItem> {
   }
 
   void changeAmount(int newAmount) {
+    if (newAmount < 1 || newAmount > 99){
+      return;
+    }
     setState(() {
-      widget.item.amount = newAmount.clamp(1, 99);
+      widget.item.amount = newAmount;
     });
     Provider.of<ItemProvider>(context, listen: false).changeAmountFromIndex(widget.index, newAmount);
     Provider.of<ItemProvider>(context, listen: false).reloadTotalPrice();
@@ -52,12 +57,16 @@ class _ListItemState extends State<ListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
       height: 8.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: backgroundColor,
+      ),
       child: Material(
         borderRadius: BorderRadius.circular(15),
-        elevation: 4,
-        color: Colors.white,
+        color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
           onTap: widget.onTap,
@@ -78,8 +87,8 @@ class _ListItemState extends State<ListItem> {
                   _categoryIndicator()
                 ],
               ),
+              Positioned(left: 37.w, top: 2.25.h, child: _amountChangerWidget()),
               Positioned(left: 48.w, bottom: 2.25.h, top: 2.25.h, child: _itemAmount()),
-              Positioned(left: 40.w, bottom: 2.25.h, top: 3.h, child: _popupNumberChanger()),
             ],
           ),
         ),
@@ -142,7 +151,14 @@ class _ListItemState extends State<ListItem> {
         child: InkWell(
           borderRadius: BorderRadius.circular(5),
           onTap: () {
-            // TODO : Popup bei dem man die Anzahl verändern kann
+            setState(() {
+              _isPoppedUp = true;
+              timerHandler.startTimer(() {
+                setState(() {
+                  _isPoppedUp = false;
+                });
+              });
+            });
           },
           child: Center(
             child: Text(
@@ -154,24 +170,6 @@ class _ListItemState extends State<ListItem> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _popupNumberChanger() {
-    return Center(
-      child: NumberPicker(
-        minValue: 1,
-        maxValue: 99,
-        textStyle: GoogleFonts.poppins(
-            color: const Color(0xFF5A5A5A),
-            fontSize: 12.sp
-        ),
-        value: widget.item.amount,
-        onChanged: (value) {
-          changeAmount(value);
-          print("JETZT");
-        },
       ),
     );
   }
@@ -238,12 +236,68 @@ class _ListItemState extends State<ListItem> {
     );
   }
 
-
-
-
-
-
-
+  Widget _amountChangerWidget() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+      width: _isPoppedUp ? 14.h : 0,
+      height: _isPoppedUp ? 3.5.h : 0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: widget.listColor,
+      ),
+      child: _isPoppedUp
+          ? Padding(
+        padding: EdgeInsets.symmetric(horizontal: 1.w),
+            child: Row(
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CustomInkWellButton(
+                        height: 3.h,
+                        width: 3.h,
+                        color: const Color(0xFF4E4E4E),
+                        onTap: () {
+                          timerHandler.restartTimer();
+                          changeAmount(widget.item.amount - 1);
+                        },
+                        borderRadius: BorderRadius.circular(5),
+                        child: Icon(
+                          Icons.remove,
+                          color: widget.listColor.withOpacity(0.2),
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 4.h,),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CustomInkWellButton(
+                        height: 3.h,
+                        width: 3.h,
+                        color: const Color(0xFF4E4E4E),
+                        onTap: () {
+                          timerHandler.restartTimer();
+                          changeAmount(widget.item.amount + 1);
+                        },
+                        borderRadius: BorderRadius.circular(5),
+                        child: Icon(
+                          Icons.add,
+                          color: widget.listColor.withOpacity(0.2),
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+          )
+          : null,
+    );
+  }
 }
 
 
