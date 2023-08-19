@@ -5,6 +5,9 @@ import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:listdo/home_page/models/category_colors.dart';
+import 'package:listdo/list_page/providers/item_provider.dart';
+import 'package:numberpicker/numberpicker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
@@ -12,11 +15,12 @@ import '../constants.dart';
 import '../list_page/models/item.dart';
 
 class ListItem extends StatefulWidget {
-  const ListItem({super.key, required this.onTap, required this.item, required this.listColor});
+  const ListItem({super.key, required this.onTap, required this.item, required this.listColor, required this.index});
 
   final VoidCallback onTap;
   final Item item;
   final Color listColor;
+  final int index;
 
   @override
   State<ListItem> createState() => _ListItemState();
@@ -36,6 +40,14 @@ class _ListItemState extends State<ListItem> {
       })
     });
     super.initState();
+  }
+
+  void changeAmount(int newAmount) {
+    setState(() {
+      widget.item.amount = newAmount.clamp(1, 99);
+    });
+    Provider.of<ItemProvider>(context, listen: false).changeAmountFromIndex(widget.index, newAmount);
+    Provider.of<ItemProvider>(context, listen: false).reloadTotalPrice();
   }
 
   @override
@@ -66,7 +78,8 @@ class _ListItemState extends State<ListItem> {
                   _categoryIndicator()
                 ],
               ),
-              Positioned(left: 48.w, bottom: 2.25.h, top: 2.25.h, child: _itemAmount())
+              Positioned(left: 48.w, bottom: 2.25.h, top: 2.25.h, child: _itemAmount()),
+              Positioned(left: 40.w, bottom: 2.25.h, top: 3.h, child: _popupNumberChanger()),
             ],
           ),
         ),
@@ -145,6 +158,24 @@ class _ListItemState extends State<ListItem> {
     );
   }
 
+  Widget _popupNumberChanger() {
+    return Center(
+      child: NumberPicker(
+        minValue: 1,
+        maxValue: 99,
+        textStyle: GoogleFonts.poppins(
+            color: const Color(0xFF5A5A5A),
+            fontSize: 12.sp
+        ),
+        value: widget.item.amount,
+        onChanged: (value) {
+          changeAmount(value);
+          print("JETZT");
+        },
+      ),
+    );
+  }
+
   Widget _itemPrice() {
 
     late String formattedPrice;
@@ -208,4 +239,11 @@ class _ListItemState extends State<ListItem> {
   }
 
 
+
+
+
+
+
 }
+
+

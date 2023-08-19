@@ -30,6 +30,7 @@ class ItemProvider extends ChangeNotifier {
   }
 
   void reloadTotalPrice() {
+    totalPrice = 0;
     for(int i = 0; i < _items.length; i++) {
       totalPrice += _items[i].price * _items[i].amount;
     }
@@ -48,6 +49,11 @@ class ItemProvider extends ChangeNotifier {
 
   void addPriceToTotalPrice(double price) {
     totalPrice += price;
+    notifyListeners();
+  }
+
+  void changeAmountFromIndex(int index, int amount) {
+    items[index].amount = amount;
     notifyListeners();
   }
 

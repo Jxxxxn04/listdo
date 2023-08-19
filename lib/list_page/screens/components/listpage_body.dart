@@ -114,7 +114,7 @@ class ListPageBody extends StatelessWidget {
         separatorBuilder: (context, index) => SizedBox(height: 1.5.h,),
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return ListItem(onTap: () {}, item: items[index], listColor: listColor,);
+          return ListItem(onTap: () {}, item: items[index], listColor: listColor, index: index,);
         },
       ),
     );
