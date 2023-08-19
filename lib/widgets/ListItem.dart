@@ -49,19 +49,24 @@ class _ListItemState extends State<ListItem> {
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
           onTap: widget.onTap,
-          child: Row(
+          child: Stack(
             children: [
-              SizedBox(width: 3.w,),
-              _profilePictures(),
-              SizedBox(width: 4.w,),
-              _itemName(),
-              if(_isAssignedToUser) SizedBox(width: 1.5.w,),
-              if(_isAssignedToUser) _assignedToIcon(),
-              SizedBox(width: _isAssignedToUser ? 1.5.w : 3.w,),
-              _itemAmount(),
-              _itemPrice(),
-              SizedBox(width: 5.w,),
-              _categoryIndicator()
+              Row(
+                children: [
+                  SizedBox(width: 3.w,),
+                  _profilePictures(),
+                  SizedBox(width: 4.w,),
+                  _itemName(),
+                  if(_isAssignedToUser) SizedBox(width: 1.5.w,),
+                  if(_isAssignedToUser) _assignedToIcon(),
+                  SizedBox(width: _isAssignedToUser ? 1.5.w : 3.w,),
+                  _placeHolderWidget(),
+                  _itemPrice(),
+                  SizedBox(width: 5.w,),
+                  _categoryIndicator()
+                ],
+              ),
+              Positioned(left: 48.w, bottom: 2.25.h, top: 2.25.h, child: _itemAmount())
             ],
           ),
         ),
@@ -112,10 +117,12 @@ class _ListItemState extends State<ListItem> {
     );
   }
 
+  Widget _placeHolderWidget() => SizedBox(height: 7.w, width: 7.w,);
+
   Widget _itemAmount() {
     return SizedBox(
-      height: 7.w,
-      width: 7.w,
+      height: 3.5.h,
+      width: 3.5.h,
       child: Material(
         color: widget.listColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(5),
