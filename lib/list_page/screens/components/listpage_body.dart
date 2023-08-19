@@ -78,7 +78,7 @@ class ListPageBody extends StatelessWidget {
             }
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Provider.of<ItemProvider>(context, listen: false).refreshTotalPrice();
+              Provider.of<ItemProvider>(context, listen: false).reloadTotalPrice();
             });
 
 

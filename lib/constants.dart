@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Constants {
 
 
@@ -24,4 +26,13 @@ class Constants {
   static const Color darkBlueColor = Color(0xFF7785FF);
   static const Color errorBlackColor = Color(0xFF000000);
   //
+
+
+  static Future<int?> getUserID() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt("userID");
+  }
+
+
+
 }

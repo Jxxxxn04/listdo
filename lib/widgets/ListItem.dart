@@ -1,10 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttericon/font_awesome5_icons.dart';
+import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:listdo/home_page/models/category_colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
+import '../constants.dart';
 import '../list_page/models/item.dart';
 
 class ListItem extends StatefulWidget {
@@ -19,6 +23,21 @@ class ListItem extends StatefulWidget {
 }
 
 class _ListItemState extends State<ListItem> {
+
+  late int userID;
+  bool _isAssignedToUser = false;
+
+  @override
+  void initState() {
+    SharedPreferences.getInstance().then((prefValue) => {
+      setState(() {
+        userID = prefValue.getInt('userID')?? "" as int;
+        _isAssignedToUser = userID == widget.item.assignedTo;
+      })
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -36,7 +55,9 @@ class _ListItemState extends State<ListItem> {
               _profilePictures(),
               SizedBox(width: 4.w,),
               _itemName(),
-              SizedBox(width: 3.w,),
+              if(_isAssignedToUser) SizedBox(width: 1.5.w,),
+              if(_isAssignedToUser) _assignedToIcon(),
+              SizedBox(width: _isAssignedToUser ? 1.5.w : 3.w,),
               _itemAmount(),
               _itemPrice(),
               SizedBox(width: 5.w,),
@@ -76,7 +97,7 @@ class _ListItemState extends State<ListItem> {
 
   Widget _itemName() {
     return SizedBox(
-      width: 30.w,
+      width: _isAssignedToUser ? 24.w : 30.w,
       child: AutoSizeText(
         widget.item.itemName,
         overflow: TextOverflow.ellipsis,
@@ -164,5 +185,20 @@ class _ListItemState extends State<ListItem> {
       ),
     );
   }
+
+  Widget _assignedToIcon() {
+    return SizedBox(
+      height: 5.w,
+      width: 6.w,
+      child: Center(
+        child: Icon(
+          FontAwesome5.tag,
+          color: const Color(0xffFFC700),
+          size: 14.sp,
+        ),
+      ),
+    );
+  }
+
 
 }

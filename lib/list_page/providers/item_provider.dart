@@ -9,8 +9,8 @@ class ItemProvider extends ChangeNotifier {
 
   double totalPrice = 0;
 
-  void addMultipleItems(List<Item> lists) {
-    _items.addAll(lists);
+  void addMultipleItems(List<Item> items) {
+    _items.addAll(items);
     notifyListeners();
   }
 
@@ -29,7 +29,7 @@ class ItemProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void refreshTotalPrice() {
+  void reloadTotalPrice() {
     for(int i = 0; i < _items.length; i++) {
       totalPrice += _items[i].price * _items[i].amount;
     }
