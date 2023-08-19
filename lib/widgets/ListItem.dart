@@ -238,7 +238,7 @@ class _ListItemState extends State<ListItem> {
 
   Widget _amountChangerWidget() {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 50),
       curve: Curves.easeInOut,
       width: _isPoppedUp ? 14.h : 0,
       height: _isPoppedUp ? 3.5.h : 0,
