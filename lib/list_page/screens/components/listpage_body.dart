@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:listdo/list_page/providers/item_provider.dart';
 import 'package:listdo/widgets/ListItem.dart';
 import 'package:provider/provider.dart';
@@ -114,14 +115,14 @@ class ListPageBody extends StatelessWidget {
         separatorBuilder: (context, index) => SizedBox(height: 1.5.h,),
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return ListItem(onTap: () {}, item: items[index], listColor: listColor, index: index,);
+          return ListItem(
+                onTap: () {},
+                item: items[index],
+                listColor: listColor,
+                index: index,
+              );
         },
       ),
     );
-  }
-
-  Future<String> fetchData() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return "Daten sind angekommen";
   }
 }

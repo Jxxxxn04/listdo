@@ -575,7 +575,7 @@ class _NavigationBar extends StatelessWidget {
       height: 7.h,
       width: 15.w,
       child: Material(
-        color: const Color(0xFF352f3b).withOpacity(1.0),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(20.0),
         child: InkWell(
           borderRadius: BorderRadius.circular(20.0),

@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
-import 'package:http/http.dart' as http;
 
 class Api {
 
@@ -165,8 +165,39 @@ class Api {
       }
 
       return _noConnection;
-
     }
   }
 
+  Future<http.Response> changeItemAmount(int itemID, int newAmount) async {
+    final url = Uri.parse('${Constants.domainBaseUrl}/item/changeItemAmount');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': _apiKey
+    };
+    final data = {'itemID': itemID, 'newAmount': newAmount};
+
+    try {
+      final response = await http
+          .put(url, headers: headers, body: jsonEncode(data))
+          .timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print("Erfolgreich geändert!");
+        }
+      }
+
+      return response;
+    } catch (e) {
+      if (e is TimeoutException) {
+        // Ein Timeout ist aufgetreten
+        print('Timeout aufgetreten!');
+      } else {
+        // Anderer Fehler ist aufgetreten
+        print('Fehler: $e');
+      }
+
+      return _noConnection;
+    }
+  }
 }

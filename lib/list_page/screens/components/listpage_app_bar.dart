@@ -52,7 +52,6 @@ class ListPageAppBar extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: 0.5.h),
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      // TODO : Responsiv machen mit AutoSizeText
                       child: AutoSizeText(
                         listName,
                         minFontSize: 14.sp.roundToDouble(),

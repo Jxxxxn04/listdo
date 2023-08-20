@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
+import '../api.dart';
 import '../list_page/models/item.dart';
 
 class ListItem extends StatefulWidget {
@@ -32,6 +33,7 @@ class _ListItemState extends State<ListItem> {
   bool _isPoppedUp = false;
   Color backgroundColor = Colors.white;
   TimerHandler timerHandler = TimerHandler(const Duration(seconds: 2));
+  Api api = Api();
 
   @override
   void initState() {
@@ -48,6 +50,7 @@ class _ListItemState extends State<ListItem> {
     if (newAmount < 1 || newAmount > 99){
       return;
     }
+    api.changeItemAmount(widget.item.itemID, newAmount);
     setState(() {
       widget.item.amount = newAmount;
     });

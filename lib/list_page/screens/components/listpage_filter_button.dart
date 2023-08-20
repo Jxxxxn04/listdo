@@ -138,7 +138,7 @@ class _ListPageFilterButtonState extends State<ListPageFilterButton> {
   }
 
 
-  Widget _saveAndDiscardFilterOptionsButtons() {
+  Widget _saveAndDiscardFilterOptionsButtons() {  // TODO : Muss noch richtig Positioniert werden
     return Row(
       children: [
         SizedBox(
@@ -234,7 +234,7 @@ class _CheckBoxesState extends State<_CheckBoxes> {
                 lowerBoxIsChecked = value!;
               });
 
-              // TODO : Nach zuletzt hinzugefügtem filtern
+              // TODO : Nach mir zugewiesenem filtern
 
             },)
           ],
