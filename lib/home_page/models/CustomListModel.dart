@@ -3,11 +3,11 @@ import 'dart:ui';
 class CustomList {
 
   late int _listID;
-  late String _createdAt;
+  late final String _createdAt;
   late Color _listColor;
   late String _listName;
   late String _listEmoji;
-  late int _ownerID;
+  late final int _ownerID;
 
 
 

@@ -23,9 +23,9 @@ import '../../widgets/home_page_widgets.dart';
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final GlobalKey<_HomePageCreateListAnimationState> createListAnimation =
+  final createListAnimation =
       GlobalKey<_HomePageCreateListAnimationState>();
 
   @override
@@ -1286,6 +1286,11 @@ class _HomePageCreateListAnimationState
   }
 
   void createList() async {
+
+    if(_hasEmoji == false || input.text.toString().length <= 3 || _hasGradientBackground == true) {
+      return;
+    }
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int? ownerID = prefs.getInt("userID");
 
