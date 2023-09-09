@@ -59,6 +59,7 @@ dependencies:
   fluttericon: ^2.0.0
   numberpicker: ^2.1.2
   flutter_slidable: ^3.0.0
+  flutter_no_internet_widget: ^1.0.0+18-dev.1
 
 dev_dependencies:
   flutter_test:
